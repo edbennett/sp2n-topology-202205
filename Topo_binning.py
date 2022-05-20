@@ -8,7 +8,7 @@ from matplotlib.ticker import AutoLocator
 from uncertainties import ufloat
 from scipy.interpolate import interp1d,UnivariateSpline, CubicSpline
 import itertools
-import effstring_module as es
+import lib_topology as es
 import pickle as pkl
 
 plt.rcParams['font.family'] = 'serif'
@@ -22,19 +22,19 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
 #plt.style.use('classic')
 
-def find_TC(rawdata, t):
-    confs = np.unique(rawdata['nconf'])
-    Nconf = len(confs)
-    TC = np.empty(Nconf, dtype='d')
-    for i in confs:
-        data = np.compress(rawdata['nconf'] == i, rawdata)
-        idx = np.abs(data['t']-t).argmin()
-        traj = data[idx-3:idx+3]
-        f=interp1d(data['t'], data['TC'])
-        TC[i-1]=f(t)
-        #print(i, TC[i-1])
-        #TC = np.append(TC, f(t))
-    return TC
+#def find_TC(rawdata, t):
+#    confs = np.unique(rawdata['nconf'])
+#    Nconf = len(confs)
+#    TC = np.empty(Nconf, dtype='d')
+#    for i in confs:
+#        data = np.compress(rawdata['nconf'] == i, rawdata)
+#        idx = np.abs(data['t']-t).argmin()
+#        traj = data[idx-3:idx+3]
+#        f=interp1d(data['t'], data['TC'])
+#        TC[i-1]=f(t)
+#        #print(i, TC[i-1])
+#        #TC = np.append(TC, f(t))
+#    return TC
 
 def binned_std(din, bin_size):
     bin1 = []
@@ -52,8 +52,8 @@ def binned_std(din, bin_size):
     
     return a
 
-def Casimir_SP(N):
-    return (float(N)+1.)/4.
+#def Casimir_SP(N):
+#    return (float(N)+1.)/4.
 
 #for i in bin_range:
 #    s_TC_avg, s_TC_err=es.bs_avg_err_TC(TC,i )
@@ -85,10 +85,8 @@ for fname in sys.argv[3:]:
     t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
     #w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled)
 
-    #t_max = es.topo_find_tmax(TCdata, L)
-    #TC = np.compress( TCdata['t'] == t_max, TCdata['TC'] )
 
-    TC = find_TC(TCdata, t0_tmp_symE[0])
+    TC = es.find_TC(TCdata, t0_tmp_symE[0])
     autC, autC_err = es.autocorr(TC)
     tmp=ufloat(autC, autC_err)
     print(N,L,beta, t0_tmp_symE[0], t0_tmp_symE[1], autC,autC_err, file=f)
@@ -99,9 +97,6 @@ for fname in sys.argv[3:]:
     plt.xlabel(r'b')
     plt.ylabel(r'$\frac{\sigma_b}{\sigma}$')
     name_postfix='_'
-    #N,L,beta,TCdata =es.topo_load_raw_data(fname)
-    #t_max = es.topo_find_tmax(TCdata, L)
-    #TC = np.compress( TCdata['t'] == t_max, TCdata['TC'] )
 
     #autC, autC_err = es.autocorr(TC)
     #tmp=ufloat(autC, autC_err)
