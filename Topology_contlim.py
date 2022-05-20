@@ -157,7 +157,7 @@ for i in clim['N']:
     table_fits = np.compress(clim['N']==i, clim)
     print("N = ", i)
     val = ufloat(table_fits['chi'], table_fits['chi_err'])
-    print("     chi w_0(a=0 ) = ", '{:.2uS}'.format(val))
+    print("     chi*scale (a=0 ) = ", '{:.2uS}'.format(val))
     val = ufloat(table_fits['sl'], table_fits['sl_err'])
     print("     coefficient = ", '{:.2uS}'.format(val))
     print("     chi^2 = ", np.around(table_fits['chi2'],2))
@@ -174,6 +174,9 @@ plt.tight_layout()
 plt.savefig('SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'_w0.pdf')
 plt.show()
 
+plt.figure()
+plt.xlabel(r'$\sigma a^2$')
+plt.ylabel(r'$\chi_L /\sigma^2$')
 clim = np.empty(0, dtype=dtclim)
 for i in np.unique(chi_SPN['N']):
     pl_data = np.compress( chi_SPN['N'] == i, chi_SPN)
@@ -209,8 +212,10 @@ for i in np.unique(chi_SPN['N']):
     plt.errorbar( 0., popt[0], yerr=perr[0], linestyle='None', marker=marker1, color=color1)
     plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker=marker1, color=color1)
     plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color=color1, label=lab, linestyle='dashed')
-    #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
-#plt.show()
+ #   #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
+
+plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
+plt.show()
 
 for i in clim['N']:
     table_fits = np.compress(clim['N']==i, clim)
