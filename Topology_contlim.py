@@ -22,9 +22,9 @@ plt.matplotlib.rc('font', size=8)
 #plt.style.use('classic')
 
 marks = itertools.cycle( ("v" , "s" , "^" ))
-@ticker.FuncFormatter
-def major_formatter(x, pos):
-    return "%d" % x
+#@ticker.FuncFormatter
+#def major_formatter(x, pos):
+#    return "%d" % x
 
 def f(x,a,b):
     return a + b*x
@@ -111,55 +111,14 @@ for i in np.unique(chi_SPN['N']):
     plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color=color1, label=lab, linestyle='dashed')
     #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
     
-#for i in np.unique(chi_SUN['N']):
-#    pl_data = np.compress( chi_SUN['N'] == i, chi_SUN)
-#    lab = r'$SU( '+str(int(i))+')$'
-#    marker1 = next(marks)
-#
-#    xdata = 1./pl_data['scale']
-#    ydata = pl_data['chi']
-#    ydata_err = pl_data['schi']
-#
-#    popt, pcov = curve_fit(f, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-#    chi2 = np.sum( (ydata-f(xdata,*popt))**2/ydata_err**2)/( len(ydata)-2.)
-#    perr = np.sqrt(np.diag(pcov))
-#
-#    color1 = next(plt.gca()._get_lines.prop_cycler)['color']
-#    xr = np.arange(0., 1.,0.05)
-#    #plt.plot(xr, f(xr,*popt), color=color1)
-#    #, label=r'$\chi^2/DOF ='+str(np.around(chi2,2))+'$')
-#    #plt.errorbar( 0., popt[0], yerr=perr[0], linestyle='None', marker=marker1, color=color1)
-#    #plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker=marker1, color=color1)
-#    #plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color=color1, label=lab)
-#    #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
-##plt.legend(loc=1, ncol=2, frameon=False)
-#plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
-#plt.tight_layout()
-#plt.savefig('SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'.pdf')
-#plt.show()
-#
-#for i in clim['N']:
-#    table_fits = np.compress(clim['N']==i, clim)
-#    print("N = ", i)
-#    val = ufloat(table_fits['chi'], table_fits['chi_err'])
-#    print("     chi t_0^2(a=0 ) = ", '{:.2uS}'.format(val))
-#    val = ufloat(table_fits['sl'], table_fits['sl_err'])
-#    print("     coefficient = ", '{:.2uS}'.format(val))
-#    print("     chi^2 = ", np.around(table_fits['chi2'],2))
-#
-#for i in clim['N']:
-#    table_fits = np.compress(clim['N']==i, clim)
-#    val = ufloat(table_fits['chi'], table_fits['chi_err'])
-#    c2 = np.around( table_fits['chi2'],2)[0]
-#    print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
-#
-##Continuum extrapolations using the w scale
-#plt.figure()
-#plt.xlabel(r'$a^2/w_0^2$')
-#plt.ylabel(r'$\chi_L w_0^4$')
-##plt.xlim(-0.01, 0.4)
-##plt.ylim(0.0, 0.0010)
-##plt.ylim(bottom=0.0)
+plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
+plt.tight_layout()
+plt.savefig('SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'.pdf')
+plt.show()
+
+plt.figure()
+plt.xlabel(r'$a^2/w_0^2$')
+plt.ylabel(r'$\chi_L w_0^4$')
 
 
 clim = np.empty(0, dtype=dtclim)
@@ -215,55 +174,55 @@ plt.tight_layout()
 plt.savefig('SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'_w0.pdf')
 plt.show()
 
-#clim = np.empty(0, dtype=dtclim)
-#for i in np.unique(chi_SPN['N']):
-#    pl_data = np.compress( chi_SPN['N'] == i, chi_SPN)
-#    marker1 = next(marks)
-#
-#    xdata = pl_data['sqrtS']**2
-#    ydata = pl_data['chi_t']/pl_data['sqrtS']**4/pl_data['L']**4
-#    #if( np.max(ydata) > max_y_lim):
-#    #    max_y_lim = 1.4*np.max(ydata)
-#    #plt.ylim(top=max_y_lim)
-#    #if( np.min(ydata) < min_y_lim):
-#    #    min_y_lim = 0.45*np.max(ydata)
-#    #plt.ylim(min_y_lim,max_y_lim)
-#    ydata_err = np.sqrt( (4.*pl_data['chi_t']/pl_data['sqrtS']**5*pl_data['sqrtS_err'])**2
-#                        + (pl_data['schi_t']/pl_data['sqrtS']**4)**2)/pl_data['L']**4
-#    #for l in range(len(xdata)):
-#    #    val = ufloat(ydata[l],ydata_err[l])
-#    #    uval_sqrtS = ufloat(pl_data['sqrtS'][l]*pl_data['wscale'][l]**2, 
-#    #            np.sqrt( (pl_data['sqrtS_err'][l]*pl_data['wscale'][l]**2)**2 + (pl_data['sqrtS'][l]*2.*pl_data['wscale'][l]*pl_data['wscale_err'][l])**2 ))
-#    #    print(" & $", '{:.2uS}'.format(uval_sqrtS), "$ & $", '{:.2uS}'.format(val), '$ \\\\')
-#
-#    popt, pcov = curve_fit(f, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-#    chi2 = np.sum( (ydata-f(xdata,*popt))**2/ydata_err**2)/( len(ydata)-len(popt))
-#    perr = np.sqrt(np.diag(pcov))
-#    lab = r'$N_c= '+str(int(i))+'$, $\\tilde{\mathcal{X}}^2='+str(np.around(chi2,2))+'$'
-#
-#    color1 = next(plt.gca()._get_lines.prop_cycler)['color']
-#    xr = np.arange(0., np.max(xdata)*1.15,0.01)
-#    clim_tmp = np.array([(i,popt[0],perr[0], popt[1], perr[1], chi2)], dtype=dtclim)
-#    clim = np.append( clim, clim_tmp)
-#    plt.plot(xr, f(xr,*popt), color=color1, linestyle='dashed')
-#    #, label=r'$\chi^2/DOF ='+str(np.around(chi2,2))+'$')
-#    plt.errorbar( 0., popt[0], yerr=perr[0], linestyle='None', marker=marker1, color=color1)
-#    plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker=marker1, color=color1)
-#    plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color=color1, label=lab, linestyle='dashed')
-#    #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
+clim = np.empty(0, dtype=dtclim)
+for i in np.unique(chi_SPN['N']):
+    pl_data = np.compress( chi_SPN['N'] == i, chi_SPN)
+    marker1 = next(marks)
+
+    xdata = pl_data['sqrtS']**2
+    ydata = pl_data['chi_t']/pl_data['sqrtS']**4/pl_data['L']**4
+    #if( np.max(ydata) > max_y_lim):
+    #    max_y_lim = 1.4*np.max(ydata)
+    #plt.ylim(top=max_y_lim)
+    #if( np.min(ydata) < min_y_lim):
+    #    min_y_lim = 0.45*np.max(ydata)
+    #plt.ylim(min_y_lim,max_y_lim)
+    ydata_err = np.sqrt( (4.*pl_data['chi_t']/pl_data['sqrtS']**5*pl_data['sqrtS_err'])**2
+                        + (pl_data['schi_t']/pl_data['sqrtS']**4)**2)/pl_data['L']**4
+    #for l in range(len(xdata)):
+    #    val = ufloat(ydata[l],ydata_err[l])
+    #    uval_sqrtS = ufloat(pl_data['sqrtS'][l]*pl_data['wscale'][l]**2, 
+    #            np.sqrt( (pl_data['sqrtS_err'][l]*pl_data['wscale'][l]**2)**2 + (pl_data['sqrtS'][l]*2.*pl_data['wscale'][l]*pl_data['wscale_err'][l])**2 ))
+    #    print(" & $", '{:.2uS}'.format(uval_sqrtS), "$ & $", '{:.2uS}'.format(val), '$ \\\\')
+
+    popt, pcov = curve_fit(f, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
+    chi2 = np.sum( (ydata-f(xdata,*popt))**2/ydata_err**2)/( len(ydata)-len(popt))
+    perr = np.sqrt(np.diag(pcov))
+    lab = r'$N_c= '+str(int(i))+'$, $\\tilde{\mathcal{X}}^2='+str(np.around(chi2,2))+'$'
+
+    color1 = next(plt.gca()._get_lines.prop_cycler)['color']
+    xr = np.arange(0., np.max(xdata)*1.15,0.01)
+    clim_tmp = np.array([(i,popt[0],perr[0], popt[1], perr[1], chi2)], dtype=dtclim)
+    clim = np.append( clim, clim_tmp)
+    plt.plot(xr, f(xr,*popt), color=color1, linestyle='dashed')
+    #, label=r'$\chi^2/DOF ='+str(np.around(chi2,2))+'$')
+    plt.errorbar( 0., popt[0], yerr=perr[0], linestyle='None', marker=marker1, color=color1)
+    plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker=marker1, color=color1)
+    plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color=color1, label=lab, linestyle='dashed')
+    #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
 #plt.show()
-#
-#for i in clim['N']:
-#    table_fits = np.compress(clim['N']==i, clim)
-#    print("N = ", i)
-#    val = ufloat(table_fits['chi'], table_fits['chi_err'])
-#    print("     chi t_0^2(a=0 ) = ", '{:.2uS}'.format(val))
-#    val = ufloat(table_fits['sl'], table_fits['sl_err'])
-#    print("     coefficient = ", '{:.2uS}'.format(val))
-#    print("     chi^2 = ", np.around(table_fits['chi2'],2))
-#
-#for i in clim['N']:
-#    table_fits = np.compress(clim['N']==i, clim)
-#    val = ufloat(table_fits['chi'], table_fits['chi_err'])
-#    c2 = np.around( table_fits['chi2'],2)[0]
-#    print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
+
+for i in clim['N']:
+    table_fits = np.compress(clim['N']==i, clim)
+    print("N = ", i)
+    val = ufloat(table_fits['chi'], table_fits['chi_err'])
+    print("     chi / sig^2 (a=0 ) = ", '{:.2uS}'.format(val))
+    val = ufloat(table_fits['sl'], table_fits['sl_err'])
+    print("     coefficient = ", '{:.2uS}'.format(val))
+    print("     chi^2 = ", np.around(table_fits['chi2'],2))
+
+for i in clim['N']:
+    table_fits = np.compress(clim['N']==i, clim)
+    val = ufloat(table_fits['chi'], table_fits['chi_err'])
+    c2 = np.around( table_fits['chi2'],2)[0]
+    print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
