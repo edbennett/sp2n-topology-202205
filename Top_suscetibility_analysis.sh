@@ -13,6 +13,7 @@ for j in 2 4 6 8; do
 	done
 done
 
+python produce_bs_sample.py WF_2_20_2.55 
 
 
 #FIGURE1
