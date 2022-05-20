@@ -6,7 +6,7 @@ import matplotlib.ticker as ticker
 from matplotlib import gridspec
 from matplotlib.ticker import AutoLocator
 import itertools
-import effstring_module as es
+import lib_topology as es
 
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Computer Modern Roman']
