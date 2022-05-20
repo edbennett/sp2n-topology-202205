@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +22,8 @@ plt.rcParams['errorbar.capsize'] = 2
 plt.rcParams['lines.markersize'] = 4
 plt.matplotlib.rc('font', size=12)
 #plt.style.use('classic')
+
+outdir = os.environ.get('PLOT_DIR', '.')
 
 def f1(x,a,b):
 	return a+b*x
@@ -153,8 +156,8 @@ plt.errorbar( 0., popt[0], yerr=perr[0], linestyle='None', marker='o', color=col
 
 plt.tight_layout()
 plt.legend(loc=2)
-plt.savefig('ScaledChi.pdf')
-plt.show()
+plt.savefig(outdir + '/ScaledChi.pdf')
+#plt.show()
 
 plt.figure()
 #plt.title(r'$N_{\mathrm{SU}}>'+str(Nmin1)+'$, $N_{\mathrm{Sp}}>'+str(Nmin2)+'$')
@@ -218,5 +221,5 @@ for i in chi_total:
 print(chi_total)
 plt.tight_layout()
 plt.legend(loc=2)
-plt.savefig('NONScaledChi.pdf')
-plt.show()
+plt.savefig(outdir + '/NONScaledChi.pdf')
+#plt.show()

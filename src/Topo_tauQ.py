@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,6 +19,8 @@ plt.rcParams['errorbar.capsize'] = 2
 plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=8)
 #plt.style.use('classic')
+
+outdir = os.environ.get('PLOT_DIR', '.')
 
 
 marks = itertools.cycle( ("v" , "s" , "^" ))
@@ -47,5 +50,5 @@ for iN in Ns:
 
 plt.legend(loc=5)
 plt.tight_layout()
-plt.savefig('tauQ_vs_t0_0.5.pdf')
-plt.show()
+plt.savefig(outdir + '/tauQ_vs_t0_0.5.pdf')
+#plt.show()

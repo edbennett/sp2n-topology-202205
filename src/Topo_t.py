@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +22,7 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
 #plt.style.use('classic')
 
+outdir = os.environ.get('PLOT_DIR', '.')
 
 TE=float(sys.argv[1])
 WE=float(sys.argv[2])
@@ -86,6 +88,6 @@ for fname in sys.argv[3:]:
         plt.hlines(y, xmin=t0_tmp_symE[0], xmax=xmax_red, alpha=0.4, linestyle='dotted', color='r')
     plt.tight_layout()
     plt.legend(loc=2, frameon=False)
-    fname_out='TCvst_'+str(N)+'_'+str(L)+'_'+str(beta)+'.pdf'
+    fname_out=outdir + '/TCvst_'+str(N)+'_'+str(L)+'_'+str(beta)+'.pdf'
     plt.savefig(fname_out)
     #plt.show()

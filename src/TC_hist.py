@@ -1,3 +1,4 @@
+import os
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -17,6 +18,8 @@ plt.rcParams['errorbar.capsize'] = 2
 plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=9)
 #plt.style.use('classic')
+
+outdir = os.environ.get('PLOT_DIR', '.')
 
 patt = re.compile(r"WF_([0-9])_([0-9]+)_([0-9]+.[0-9]+)")
     
@@ -62,7 +65,7 @@ axs0.set_xlabel(r'Trajectory')
 axs1.set_xlabel(r'Count')
 
 gs.tight_layout(fig)
-outname='TC_hist_'+N+'.pdf'
+outname=outdir + '/TC_hist_'+N+'.pdf'
 #outname='TC_hist_'+N+'_'+str(beta)+'.pdf'
 plt.savefig(outname)
 plt.show()

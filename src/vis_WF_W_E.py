@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +15,8 @@ plt.rcParams['errorbar.capsize'] = 2
 plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
 #plt.style.use('classic')
+
+outdir = os.environ.get('PLOT_DIR', '.')
 
 TE=float(sys.argv[1])
 WE=float(sys.argv[2])
@@ -78,6 +81,6 @@ for faddr in sys.argv[3:]:
         label=lab1, color=color1, alpha=0.5)
     ax[1].legend(bbox_to_anchor=(1.0,1.0), loc='upper left', frameon=False )
 plt.tight_layout()
-plt.savefig('non_scaled_flows_'+str(N)+'_'+str(TE)+'_'+str(WE)+'.pdf')
+plt.savefig(outdir + '/non_scaled_flows_'+str(N)+'_'+str(TE)+'_'+str(WE)+'.pdf')
 #plt.show()
 

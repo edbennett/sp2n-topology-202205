@@ -1,6 +1,7 @@
+import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import re
 import matplotlib.ticker as ticker
 #from matplotlib import gridspec
@@ -28,6 +29,8 @@ import pickle as pkl
 #def major_formatter(x, pos):
 #    return "%d" % x
 #data_nconf = np.genfromtxt('NCONF_vs_setup.txt', usecols=(0,1,2,3), dtype=[("N",'i'), ("L",'i'),("beta", 'd'), ("Nconf",'i8')])
+
+outdir = os.environ.get('TABLES_DIR', '.')
 
 sqrts_data = np.genfromtxt('sqrts_vs_beta.dat', usecols=(0,1,3,4,5), dtype=[("N",'i'), ("L",'i'), ("beta",'d'),('sqrts','d'),('sqrts_err','d')]) 
 
@@ -95,4 +98,4 @@ for fname in sys.argv[3:]:
                         WE_scaled,"$  &  $",
                          '{:.2uS}'.format(ufloat(w0_tmp_symE[0], w0_tmp_symE[1])),"$  &  $",
                          '{:.2uS}'.format(ufloat(s_TC_w_avg, s_TC_w_err)),"$ \\\\", 
-                        file=open("table_chi_t0_w0.tex", "a"))
+                        file=open(outdir + "/table_chi_t0_w0.tex", "a"))

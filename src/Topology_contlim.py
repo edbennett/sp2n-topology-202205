@@ -1,3 +1,4 @@
+import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,6 +21,8 @@ plt.rcParams['errorbar.capsize'] = 2
 plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=8)
 #plt.style.use('classic')
+
+outdir = os.environ.get('PLOT_DIR', '.')
 
 marks = itertools.cycle( ("v" , "s" , "^" ))
 #@ticker.FuncFormatter
@@ -113,8 +116,8 @@ for i in np.unique(chi_SPN['N']):
     
 plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
 plt.tight_layout()
-plt.savefig('SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'.pdf')
-plt.show()
+plt.savefig(outdir + '/SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'.pdf')
+#plt.show()
 
 plt.figure()
 plt.xlabel(r'$a^2/w_0^2$')
@@ -171,8 +174,8 @@ for i in clim['N']:
 #plt.legend(loc=1, ncol=2, frameon=False)
 plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
 plt.tight_layout()
-plt.savefig('SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'_w0.pdf')
-plt.show()
+plt.savefig(outdir + '/SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'_w0.pdf')
+#plt.show()
 
 plt.figure()
 plt.xlabel(r'$\sigma a^2$')

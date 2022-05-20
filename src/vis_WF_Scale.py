@@ -1,4 +1,5 @@
 import sys
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from uncertainties import ufloat, unumpy
@@ -16,6 +17,7 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
 #plt.style.use('classic')
 
+outdir = os.environ.get('PLOT_DIR', '.')
 
 TE=float(sys.argv[1])
 WE=float(sys.argv[2])
@@ -138,7 +140,7 @@ plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color='black', fmt='o', label=r'
 
 plt.tight_layout()
 plt.legend(loc='upper left', prop={'size': 6}, frameon=False)
-plt.savefig('Scale_'+str(N)+'_t0.pdf')
+plt.savefig(outdir + '/Scale_'+str(N)+'_t0.pdf')
 #plt.show()
 
 plt.figure()
@@ -169,6 +171,6 @@ plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color='black', fmt='^', label=r'
 plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color='black', fmt='o', label=r'clover')
 plt.tight_layout()
 plt.legend(loc='upper left', prop={'size': 6}, frameon=False)
-plt.savefig('Scale_'+str(N)+'_w0.pdf')
+plt.savefig(outdir + '/Scale_'+str(N)+'_w0.pdf')
 #plt.show()
 
