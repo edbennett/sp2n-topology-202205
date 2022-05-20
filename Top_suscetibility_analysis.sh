@@ -56,3 +56,5 @@ python scripts/Topology.py ${TE} ${WE} ${DDIR}/WF_2_{20_2.55,24_2.60,32_2.65,32_
 	${DDIR}/WF_4_{20_7.7,20_7.72,20_7.76,20_7.78,20_7.80,20_7.85,24_8.2} \
 	${DDIR}/WF_6_{18_15.75,16_15.9,16_16.1,20_16.3} \
 	${DDIR}/WF_8_16_{26.5,26.7,27.0,27.2} > chi_vs_t0_${TE}_w0_${WE}_scaled.dat
+
+python scripts/Topology_contlim.py chi_vs_t0_${TE}_w0_${WE}_scaled.dat
