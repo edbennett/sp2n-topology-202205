@@ -216,6 +216,9 @@ def avg_flows(in_flow):
 def Casimir_SP(N):
     return (float(N)+1.)/4.
 
+def Casimir_SUN(n):
+	return (float(n)**2-1.)/(2.*float(n))
+
 def find_TC(rawdata, t):
     confs = np.unique(rawdata['nconf'])
     Nconf = len(confs)
@@ -232,3 +235,6 @@ def find_TC(rawdata, t):
 
 def d_g_SPN(n):
 	return n*(2.*n+1.)
+
+def d_g_SUN(n):
+	return n**2-1.

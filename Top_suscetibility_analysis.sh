@@ -1,4 +1,4 @@
-DDIR=/home/davide/documenti/physics/montecarlo/data_WF
+DDIR=./
 TE=0.5
 WE=0.5
 
@@ -6,22 +6,23 @@ WE=0.5
 rm tmp0_tauQ
 for j in 2 4 6 8; do
 	for i in `grep "^${j}" ${DDIR}/DATA_FILES | cut -d, -f5`; do 
-		python scripts/Topo_binning.py ${TE} ${WE} $i >> tmp0_tauQ
+		python Topo_binning.py ${TE} ${WE} $i >> tmp0_tauQ
 		grep "${i}" DATA_FILES | cut -d, -f4 | paste -d" " tmp0_tauQ - > tmp1_tauQ
 		awk '{print "$"$1"$ & $"$2"$ & $"$3"$ & $"$4"$ \\\\"}' tmp1_tauQ
 		rm tmp0_tauQ tmp1_tauQ
 	done
 done
 
+#Produces the Bootstrap sample for the flow
 python produce_bs_sample.py WF_2_20_2.55 
 
 
 #FIGURE 1
-python scripts/vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_6_{16_15.9,16_16.1}
-#python scripts/vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_2_{20_2.55,24_2.60,32_2.65,32_2.70}
-#python scripts/vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_4_{20_{7.7,7.72,7.76,7.78,7.80,7.85},24_8.2}
-#python scripts/vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_6_{18_15.75,16_15.9,16_16.1,20_16.3}
-#python scripts/vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_8_16_{26.5,26.7,27.0,27.2}
+python vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_6_{16_15.9,16_16.1}
+#python vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_2_{20_2.55,24_2.60,32_2.65,32_2.70}
+#python vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_4_{20_{7.7,7.72,7.76,7.78,7.80,7.85},24_8.2}
+#python vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_6_{18_15.75,16_15.9,16_16.1,20_16.3}
+#python vis_WF_W_E.py ${TE} ${WE} ${DDIR}/WF_8_16_{26.5,26.7,27.0,27.2}
 
 # FIGURE 2, 12 PLUS TABLES 2, 3, 7, 8, 9
 python scripts/vis_WF_Scale.py ${TE} ${WE} ${DDIR}/WF_2_{20_2.55,24_2.60,32_2.65,32_2.70} > Scale_2.dat
