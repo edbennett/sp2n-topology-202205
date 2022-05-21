@@ -12,6 +12,8 @@ import lib_topology as es
 from scipy.optimize import curve_fit, least_squares
 from scipy import linalg
 
+from tables_base import table_start, table_end
+
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Computer Modern Roman']
 plt.rcParams['text.usetex'] = True
@@ -24,6 +26,9 @@ plt.matplotlib.rc('font', size=12)
 #plt.style.use('classic')
 
 outdir = os.environ.get('PLOT_DIR', '.')
+quoted_dir = os.environ.get('QUOTED_DIR', '.')
+processed_dir = os.environ.get('PROCESSED_DIR', '.')
+tables_dir = os.environ.get('TABLES_DIR', '.')
 
 def f1(x,a,b):
 	return a+b*x
@@ -61,20 +66,18 @@ plt.ylim(0., 0.015)
 plt.xlim(-0.05, 0.4)
 xr = np.arange(0., 0.65,0.01)
 
-for key,val in files_SU.items():
-	fname=val
-	chi_SUN_raw = np.genfromtxt(fname, usecols=(0,1,2),names=['N','chi', 'schi'])
+for label, fname in files_SU.items():
+	chi_SUN_raw = np.genfromtxt(quoted_dir + '/' + fname, usecols=(0,1,2),names=['N','chi', 'schi'])
 	chi_SUN= np.compress( chi_SUN_raw['N']>Nmin1, chi_SUN_raw)
 	#xdata = 1/chi_SUN_raw['N']
 	xdata = 1./es.d_g_SUN(chi_SUN_raw['N'])
 	ydata = chi_SUN_raw['chi']*scaling_SUN(chi_SUN_raw['N'])
 	ydata_err = chi_SUN_raw['schi']*scaling_SUN(chi_SUN_raw['N'])
-	lab=key
 	color1 = next(plt.gca()._get_lines.prop_cycler)['color']
-	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='^', color=color1, label=lab, alpha=0.7)
+	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='^', color=color1, label=label, alpha=0.7)
 	
 	tmp_total = np.empty(len(xdata),dtype=tot_dtype)
-	tmp_total['label']=key
+	tmp_total['label'] = label
 	tmp_total['N_c']=chi_SUN_raw['N']
 	tmp_total['d_G']=xdata
 	tmp_total['sc_chi']=ydata
@@ -94,20 +97,18 @@ print("b = ", '{:.2uS}'.format(ufloat(popt[1],perr[1])))
 print(" chi2 = ", np.around(chi2,2))
 print(" DOF = ", len(ydata)-len(popt))
 
-for key,val in files_Sp.items():
-	fname=val
-	chi_SPN_raw = np.genfromtxt(fname, usecols=(0,1,2),names=['N','chi', 'schi'])
+for label, fname in files_Sp.items():
+	chi_SPN_raw = np.genfromtxt(processed_dir + '/' + fname, usecols=(0,1,2),names=['N','chi', 'schi'])
 	chi_SPN = np.compress( chi_SPN_raw['N']>Nmin2, chi_SPN_raw)
 	#xdata = 1/(2.*chi_SPN_raw['N'])
 	xdata = 1./es.d_g_SPN(chi_SPN_raw['N'])
 	ydata = chi_SPN_raw['chi']*scaling_SPN(chi_SPN_raw['N'])
 	ydata_err = chi_SPN_raw['schi']*scaling_SPN(chi_SPN_raw['N'])
-	lab=key
 	color1 = next(plt.gca()._get_lines.prop_cycler)['color']
-	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='o', color=color1, label=lab, alpha=0.7)
+	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='o', color=color1, label=label, alpha=0.7)
 
 	tmp_total = np.empty(len(xdata),dtype=tot_dtype)
-	tmp_total['label']=key
+	tmp_total['label'] = label
 	tmp_total['N_c']=chi_SPN_raw['N']
 	tmp_total['d_G']=xdata
 	tmp_total['sc_chi']=ydata
@@ -167,56 +168,94 @@ plt.ylim(0., 0.085)
 plt.xlim(-0.05, 0.6)
 xr = np.arange(0., 0.65,0.01)
 
-for key,val in files_SU.items():
-	fname=val
-	chi_SUN_raw = np.genfromtxt(fname, usecols=(0,1,2),names=['N','chi', 'schi'])
+for label, fname in files_SU.items():
+	chi_SUN_raw = np.genfromtxt(quoted_dir + '/' + fname, usecols=(0,1,2),names=['N','chi', 'schi'])
 	chi_SUN= np.compress( chi_SUN_raw['N']>Nmin1, chi_SUN_raw)
 	xdata = 1/chi_SUN_raw['N']
 	#xdata = 1./es.d_g_SUN(chi_SUN_raw['N'])
 	ydata = chi_SUN_raw['chi']
 	ydata_err = chi_SUN_raw['schi']
-	lab=key
 	color1 = next(plt.gca()._get_lines.prop_cycler)['color']
-	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='^', color=color1, label=lab, alpha=0.7)
+	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='^', color=color1, label=label, alpha=0.7)
 	
 	tmp_total = np.empty(len(xdata),dtype=tot_dtype)
-	tmp_total['label']=key
+	tmp_total['label'] = label
 	tmp_total['N_c']=chi_SUN_raw['N']
 	tmp_total['d_G']=xdata
 	tmp_total['sc_chi']=ydata
 	tmp_total['sc_chi_err']=ydata_err
 	chi_total = np.append(chi_total, tmp_total)
 
-for key,val in files_Sp.items():
-	fname=val
-	chi_SPN_raw = np.genfromtxt(fname, usecols=(0,1,2),names=['N','chi', 'schi'])
+for label, fname in files_Sp.items():
+	chi_SPN_raw = np.genfromtxt(processed_dir + '/' + fname, usecols=(0,1,2),names=['N','chi', 'schi'])
 	chi_SPN = np.compress( chi_SPN_raw['N']>Nmin2, chi_SPN_raw)
 	xdata = 1/(2.*chi_SPN_raw['N'])
 	#xdata = 1./es.d_g_SPN(chi_SPN_raw['N'])
 	ydata = chi_SPN_raw['chi']
 	ydata_err = chi_SPN_raw['schi']
-	lab=key
 	color1 = next(plt.gca()._get_lines.prop_cycler)['color']
-	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='o', color=color1, label=lab, alpha=0.7)
+	plt.errorbar(xdata , ydata, yerr=ydata_err, linestyle='None', marker='o', color=color1, label=label, alpha=0.7)
 
 	tmp_total = np.empty(len(xdata),dtype=tot_dtype)
-	tmp_total['label']=key
+	tmp_total['label'] = label
 	tmp_total['N_c']=chi_SPN_raw['N']
 	tmp_total['d_G']=xdata
 	tmp_total['sc_chi']=ydata
 	tmp_total['sc_chi_err']=ydata_err
 	chi_total = np.append(chi_total, tmp_total)
 
-for i in chi_total:
-	print_val = ufloat(i['sc_chi'], i['sc_chi_err'])
-	if( i['label'] == "Bennett et al."):
-		scaling = np.around(scaling_SPN(int(i['N_c'])),4)
-		group="$ Sp("
+citations = {
+	'Bennett et al.': 'topology',
+	'Lucini et al.': 'Lucini:2001ej',
+	'Del Debbio et al.': 'DelDebbio:2002xa',
+	'Bonati et al.': 'Bonati:2016tvi',
+	'Bonanno et al.': {
+		3: 'Bonanno:2020hht,Panagopoulos:2011rb, Bonati:2015sqt',
+		None: 'Bonanno:2020hht'
+	},
+	'Athenodorou et al.': 'Athenodorou:2021qvs'
+}
+
+def get_citation(label, Nc):
+	if label not in citations:
+		return ''
+	elif isinstance(citations[label], str):
+		return citations[label]
+	elif Nc in citations[label]:
+		return citations[label][Nc]
 	else:
-		scaling = np.around(scaling_SUN(int(i['N_c'])),4)
-		group="$ SU("
-	print( group, int(i['N_c']), ")$ &", np.around(i['d_G'],2), "$ & $", 
-		i['label']," & $", '{:.2uS}'.format(print_val), "$ & $", scaling, "$ \\\\")
+		return citations[label][None]
+
+
+def sort_key(tot):
+	label_order = list(citations.keys())
+	return label_order.index(tot['label']), int(tot['N_c'])
+
+
+with open(tables_dir + '/summary_table.tex', 'w') as outfile:
+	print(table_start.format(columnspec='cccc'), file=outfile)
+	print(r'Group & Reference & $\chi/\sigma^2$ & $C_2(F)^2/d_G$ \\',
+	      file=outfile)
+
+	prev_label = None
+	# Only use second half of chi_total
+	for i in sorted(chi_total[len(chi_total) // 2:], key=sort_key):
+		if i['label'] != prev_label:
+			print(r'\hline', file=outfile)
+			prev_label = i['label']
+
+		print_val = ufloat(i['sc_chi'], i['sc_chi_err'])
+		if( i['label'] == "Bennett et al."):
+			scaling = np.around(scaling_SPN(int(i['N_c'])),4)
+			group=f"$ Sp({int(i['N_c']) * 2})$"
+		else:
+			scaling = np.around(scaling_SUN(int(i['N_c'])),4)
+			group=f"$ SU({int(i['N_c'])})$"
+		print(group, "&", i['label'], "\\cite{",
+		      get_citation(i['label'], int(i['N_c'])), "} & $",
+		      '{:.2uS}'.format(print_val), "$ & $", scaling, "$ \\\\",
+		      file=outfile)
+	print(table_end, file=outfile)
 
 print(chi_total)
 plt.tight_layout()
