@@ -1,3 +1,12 @@
+# Ignore data, both source raw data, and generated results
+data/
+pkl_flows_bs/
+processed_data/
+plots/
+tables/
+
+# GitHub boilerplate follows
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
