@@ -102,5 +102,9 @@ SHORT_FIGS = ${SHORT_PLOT_DIR}/ScaledChi.pdf ${SHORT_PLOT_DIR}/NONScaledChi.pdf
 ${SHORT_FIGS} &: $(foreach AUTHORS,AA_MT DD_EV_HP CB_MD CB_CB_MD BL_MT,quoted_data/clim_SU_${AUTHORS}.dat) ${PROC_DIR}/clim_SP.dat | ${PLOT_DIR}
 	PLOT_DIR=${SHORT_PLOT_DIR} python src/fits_largeN_universality.py
 
-figures : $(foreach FIGNUM, 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17,${FIG${FIGNUM}_OUTPUT}) ${SHORT_FIGS}
-tables : $(foreach TABNUM, 1 2 3 456 7 8 9 10 11 12, ${TAB${TABNUM}_OUTPUT})
+long-figures : $(foreach FIGNUM, 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17,${FIG${FIGNUM}_OUTPUT}) ${SHORT_FIGS}
+long-tables : $(foreach TABNUM, 1 2 3 456 7 8 9 10 11 12, ${TAB${TABNUM}_OUTPUT})
+short-figures : ${SHORT_FIGS}
+short-tables :
+figures : long-figures short-figures
+tables : long-tables short-tables
