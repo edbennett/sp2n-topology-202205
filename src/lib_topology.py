@@ -166,18 +166,18 @@ def flows(rawdata, N_bs, obs, Ntherm=500):
     bs_flow = np.empty(N_bs*len(ts), dtype=[('bs','i'),('t','f8'),('flow','f8')])
     w0_flow = np.empty(N_bs*(len(ts)-1), dtype=[('bs','i'),('t','f8'),('flow','f8')])
     tmp_bs_flow = np.empty(Nconf*len(ts), dtype=[('nconf','int'),('t','f8'),('E','f8'),('t2E','f8'),('Esym','f8'),('t2symE','f8'),('TC','f8')])
+    per_conf_flows = {}
+    for s in set(rawdata['nconf']):
+        current_conf_locs = np.where(rawdata['nconf'] == s)[0]
+        conf_lbound = current_conf_locs[0]
+        conf_ubound = current_conf_locs[-1] + 1
+        per_conf_flows[s] = rawdata[conf_lbound:conf_ubound]
     for i_bs in range(N_bs):
         #print(i_bs)
         sam = rng.integers(Ntherm,Nconf+1,size=Nconf)
         i_c=0
         for s in sam:
-            tmp = np.compress(rawdata['nconf'] == s, rawdata)
-            for l_t in range(len(ts)):
-                try:
-                    tmp_bs_flow[i_c*len(ts)+l_t] = tmp[l_t]
-                except:
-                    print("error at :", s, l_t)
-                #print(i_c, l_t, tmp_bs_flow[i_c*len(ts)+l_t], tmp[l_t])
+            tmp_bs_flow[i_c*len(ts):(i_c+1)*len(ts)] = per_conf_flows[s]
             i_c=i_c+1
         #tmp_bs_flow = np.append(tmp_bs_flow, tmp)
         #print(tmp_bs_flow)
