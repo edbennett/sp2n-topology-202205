@@ -4,6 +4,8 @@ pkl_flows_bs/
 processed_data/
 plots/
 tables/
+short_plots/
+short_tables/
 
 # GitHub boilerplate follows
 
