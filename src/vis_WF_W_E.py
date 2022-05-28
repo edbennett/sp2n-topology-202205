@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import numpy as np
@@ -16,17 +17,26 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
 #plt.style.use('classic')
 
+parser = argparse.ArgumentParser()
+parser.add_argument('TE', type=float)
+parser.add_argument('WE', type=float)
+parser.add_argument('infiles', nargs='+')
+parser.add_argument('--outfile', required=True)
+parser.add_argument('--absolute_scales', action='store_true')
+args = parser.parse_args()
+
 outdir = os.environ.get('PLOT_DIR', '.')
 
-TE=float(sys.argv[1])
-WE=float(sys.argv[2])
-
 fig, ax = plt.subplots(2,1, sharex=True)
-for faddr in sys.argv[3:]:
+for faddr in args.infiles:
     N,L,beta,rawdata=es.topo_load_raw_data(faddr)
-    TE_scaled = TE*es.Casimir_SP(N)
-    WE_scaled = WE*es.Casimir_SP(N)
-    
+    if args.absolute_scales:
+        TE_scaled = args.TE
+        WE_scaled = args.WE
+    else:
+        TE_scaled = args.TE*es.Casimir_SP(N)
+        WE_scaled = args.WE*es.Casimir_SP(N)
+
     print("loading flow files")
     fn_bs='pkl_flows_bs/pkl_bs_'+N+'_'+L+'_'+beta+'_'
     infile = open(fn_bs+'t_E','rb')
@@ -81,6 +91,6 @@ for faddr in sys.argv[3:]:
         label=lab1, color=color1, alpha=0.5)
     ax[1].legend(bbox_to_anchor=(1.0,1.0), loc='upper left', frameon=False )
 plt.tight_layout()
-plt.savefig(outdir + '/non_scaled_flows_'+str(N)+'_'+str(TE)+'_'+str(WE)+'.pdf')
+plt.savefig(args.outfile)
 #plt.show()
 

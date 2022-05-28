@@ -27,7 +27,7 @@ plt.matplotlib.rc('font', size=12)
 
 outdir = os.environ.get('PLOT_DIR', '.')
 quoted_dir = os.environ.get('QUOTED_DIR', '.')
-processed_dir = os.environ.get('PROCESSED_DIR', '.')
+processed_dir = os.environ.get('PROC_DIR', '.')
 tables_dir = os.environ.get('TABLES_DIR', '.')
 
 def f1(x,a,b):
@@ -52,7 +52,7 @@ files_SU = { "Athenodorou et al.":"clim_SU_AA_MT.dat",
 			"Bonanno et al.":"clim_SU_CB_CB_MD.dat",
 			"Lucini et al.":"clim_SU_BL_MT.dat"}
 
-files_Sp = { "Bennett et al.":"clim_SP.dat"}
+files_Sp = { "Bennett et al.":"clim_SP_0.225_0.225.dat"}
 
 
 tot_dtype = np.dtype([('label','U100'),('N_c','i'),('d_G','d'),('sc_chi','d'),('sc_chi_err','d')])

@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import sys
 import os
 import numpy as np
@@ -17,10 +18,11 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
 #plt.style.use('classic')
 
-outdir = os.environ.get('PLOT_DIR', '.')
-
-TE=float(sys.argv[1])
-WE=float(sys.argv[2])
+parser = ArgumentParser()
+parser.add_argument('files_to_process', nargs='+')
+parser.add_argument('--t0_plot_filename', default='t0_scale.pdf')
+parser.add_argument('--w0_plot_filename', default='w0_scale.pdf')
+args = parser.parse_args()
 
 fdtype=np.dtype([('N','i'),('L','i'),('beta','d'),('obs','U'),
                  ('E0','d'),('t','d'),('st','d'),
@@ -31,7 +33,7 @@ final_symE = np.empty(0,dtype=fdtype)
 
 e0_list = [ 0.3, 0.4, 0.5, 0.6]
 for TE in e0_list:
-    for faddr in sys.argv[3:]:
+    for faddr in args.files_to_process:
         N,L,beta,rawdata=es.topo_load_raw_data(faddr)
         TE_scaled = TE
         WE_scaled = TE
@@ -140,7 +142,7 @@ plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color='black', fmt='o', label=r'
 
 plt.tight_layout()
 plt.legend(loc='upper left', prop={'size': 6}, frameon=False)
-plt.savefig(outdir + '/Scale_'+str(N)+'_t0.pdf')
+plt.savefig(args.t0_plot_filename)
 #plt.show()
 
 plt.figure()
@@ -171,6 +173,6 @@ plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color='black', fmt='^', label=r'
 plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color='black', fmt='o', label=r'clover')
 plt.tight_layout()
 plt.legend(loc='upper left', prop={'size': 6}, frameon=False)
-plt.savefig(outdir + '/Scale_'+str(N)+'_w0.pdf')
+plt.savefig(args.w0_plot_filename)
 #plt.show()
 

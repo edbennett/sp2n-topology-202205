@@ -39,7 +39,8 @@ def g(x,a,b,c):
     return a+b*x+c*x**2
 
 
-faddr=sys.argv[1]
+faddr = sys.argv[1]
+outfile = sys.argv[2] if (len(sys.argv) > 1) else sys.stdout
 
 patt = re.compile(r"chi_vs_t0_([0-9]+.[0-9]+)_w0_([0-9]+.[0-9]+)_([a-z]+).dat")
 t0, w0, labf, = patt.search(faddr).groups()
@@ -218,7 +219,7 @@ for i in np.unique(chi_SPN['N']):
  #   #plt.text(0.5, 0.5, 'PRELIMINARY', fontsize=40, color='gray', alpha=0.5,ha='center', va='center', rotation='30')
 
 plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
-plt.show()
+#plt.show()
 
 for i in clim['N']:
     table_fits = np.compress(clim['N']==i, clim)
@@ -229,8 +230,10 @@ for i in clim['N']:
     print("     coefficient = ", '{:.2uS}'.format(val))
     print("     chi^2 = ", np.around(table_fits['chi2'],2))
 
-for i in clim['N']:
-    table_fits = np.compress(clim['N']==i, clim)
-    val = ufloat(table_fits['chi'], table_fits['chi_err'])
-    c2 = np.around( table_fits['chi2'],2)[0]
-    print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
+with open(outfile, 'w') as f:
+    for i in clim['N']:
+        table_fits = np.compress(clim['N']==i, clim)
+        val = ufloat(table_fits['chi'], table_fits['chi_err'])
+        c2 = np.around( table_fits['chi2'],2)[0]
+        print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
+        print(i, table_fits['chi'][0], table_fits['chi_err'][0], file=f)

@@ -154,5 +154,4 @@ for faddr in sys.argv[3:]:
 plt.tight_layout()
 #plt.savefig('non_scaled_flows_'+str(int(N))+'_'+str(beta)+'.pdf')
 plt.savefig(outdir + '/flows_'+str(TE)+'_'+str(WE)+'_scaled.pdf')
-plt.show()
-
+#plt.show()

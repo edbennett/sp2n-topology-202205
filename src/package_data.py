@@ -10,6 +10,7 @@ def package(flow_filenames, hdf5_filename):
         plaqs = h5file.require_group('plaqs')
         byensemble = h5file.require_group('byensemble')
         for fname in flow_filenames:
+            print('Processing', fname, end='\r')
             N, L, beta, flow_data = es.topo_load_raw_data(fname)
 
             flow_ds = flows.create_dataset(name=f'{N}_{L}_{beta}',

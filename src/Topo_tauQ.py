@@ -1,5 +1,4 @@
-import os
-import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import re
@@ -20,13 +19,14 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=8)
 #plt.style.use('classic')
 
-outdir = os.environ.get('PLOT_DIR', '.')
-
+parser = argparse.ArgumentParser()
+parser.add_argument('infile')
+parser.add_argument('outfile')
+args = parser.parse_args()
 
 marks = itertools.cycle( ("v" , "s" , "^" ))
 
-faddr=sys.argv[1]
-rawdata = np.genfromtxt(faddr,
+rawdata = np.genfromtxt(args.infile,
                         usecols=(0,1,2,3,4,5,6),
                         names=['N', 'beta','Nupd', 't', 'st','tQ', 'stQ'])
 
@@ -50,5 +50,5 @@ for iN in Ns:
 
 plt.legend(loc=5)
 plt.tight_layout()
-plt.savefig(outdir + '/tauQ_vs_t0_0.5.pdf')
+plt.savefig(args.outfile)
 #plt.show()

@@ -68,7 +68,7 @@ gs.tight_layout(fig)
 outname=outdir + '/TC_hist_'+N+'.pdf'
 #outname='TC_hist_'+N+'_'+str(beta)+'.pdf'
 plt.savefig(outname)
-plt.show()
+#plt.show()
 
 #plt.figure()
 #plt.xlabel(r'$t$')
