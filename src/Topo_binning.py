@@ -69,7 +69,7 @@ bin_range=np.arange(1,100,1)
 
 TE=float(sys.argv[1])
 WE=float(sys.argv[2])
-outf = PROC_DIR + '/tauQ_vs_t0_'+str(TE)+'_'+str(WE)+'.dat'
+outf = PROC_DIR + '/tauQ_vs_t0_'+str(TE)+'_w0_'+str(WE)+'.dat'
 f=open(outf,'a')
 for fname in sys.argv[3:]:
     N,L,beta,TCdata =es.topo_load_raw_data(fname)

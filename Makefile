@@ -115,7 +115,7 @@ ${PLOT_DIR}/TC_hist_%.pdf : $$(call FIG6789_DEPS,$$*) | ${PLOT_DIR}
 
 # Figure 10
 FIG10_OUTPUT = ${PLOT_DIR}/tauQ_vs_t0_${TE}.pdf
-${PLOT_DIR}/tauQ_vs_t0_%.pdf : ${PROC_DIR}/tauQ_vs_t0_$$*_$$*.dat | ${PLOT_DIR}
+${PLOT_DIR}/tauQ_vs_t0_%.pdf : ${PROC_DIR}/tauQ_vs_t0_$$*_w0_$$*.dat | ${PLOT_DIR}
 	PLOT_DIR=${PLOT_DIR} python src/Topo_tauQ.py $^ $@
 
 # Table 4, 5, 6; Figure 11
@@ -126,7 +126,7 @@ FIG11_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 
 
 TAB456_OUTPUT = ${TABLES_DIR}/table_chi_t0_${TE_DEMO}_w0_${WE_DEMO}.tex
-${TABLES_DIR}/table_chi_t0_%.tex ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX})) | ${TABLES_DIR}
+${TABLES_DIR}/table_chi_t0_%.tex ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX})) | $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW})) ${TABLES_DIR}
 	TABLES_DIR=${TABLES_DIR} python src/Topology.py $(subst _w0_, ,$*) $^ > ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
