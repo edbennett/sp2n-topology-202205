@@ -125,7 +125,7 @@ FIG11_NC6_SUFFIXES = 18_15.75 16_15.9 16_16.1 20_16.3
 FIG11_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 
 
-TAB456_OUTPUT = ${TABLES_DIR}/table_chi_t0_${TE_DEMO}_w0_${WE_DEMO}.tex
+TAB45_OUTPUT = ${TABLES_DIR}/table_chi_t0_${TE}_w0_${WE}.tex
 ${TABLES_DIR}/table_chi_t0_%.tex ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX})) | $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW})) ${TABLES_DIR}
 	TABLES_DIR=${TABLES_DIR} python src/Topology.py $(subst _w0_, ,$*) $^ > ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
@@ -142,7 +142,7 @@ datapackage.h5 : ${TAB1_DEPS} $(foreach PREFIX, ${TAB1_DEPS}, ${PREFIX}_plaq)
 	python src/package_data.py $^ --hdf5_filename=$@
 
 long-figures : $(foreach FIGNUM, 1 2 3 4 5 6789 10 11 12 13 14 15 16 17,${FIG${FIGNUM}_OUTPUT}) ${SHORT_FIGS}
-long-tables : $(foreach TABNUM, 1 2 3 456 7 8 9 10 11 12, ${TAB${TABNUM}_OUTPUT})
+long-tables : $(foreach TABNUM, 1 2 3 45 6 7 8 9 10 11 12, ${TAB${TABNUM}_OUTPUT})
 short-figures : ${SHORT_FIGS}
 short-tables : ${SHORT_TABLE}
 all-figures : long-figures short-figures

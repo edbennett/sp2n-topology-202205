@@ -1,34 +1,11 @@
 import os
 import sys
 import numpy as np
-#import matplotlib.pyplot as plt
-import re
-import matplotlib.ticker as ticker
-#from matplotlib import gridspec
-#from matplotlib.ticker import AutoLocator
-from uncertainties import ufloat, unumpy
-from scipy.interpolate import interp1d,UnivariateSpline, CubicSpline
-import itertools
+from uncertainties import ufloat
 import lib_topology as es
 import pickle as pkl
 
-#plt.rcParams['font.family'] = 'serif'
-#plt.rcParams['font.serif'] = ['Computer Modern Roman']
-#plt.rcParams['text.usetex'] = True
-#plt.rcParams['lines.linewidth'] = 1
-#plt.rcParams['figure.figsize']=[1.8*3.375,1.8*3.375]
-##colours = plt.rcParams['axes.color_cycle']
-#plt.rcParams['errorbar.capsize'] = 2
-#plt.rcParams['lines.markersize'] = 2
-#plt.matplotlib.rc('font', size=11)
-##plt.style.use('classic')
-#
-#marks = itertools.cycle( ("v" , "s" , "^" ))
-#
-#@ticker.FuncFormatter
-#def major_formatter(x, pos):
-#    return "%d" % x
-#data_nconf = np.genfromtxt('NCONF_vs_setup.txt', usecols=(0,1,2,3), dtype=[("N",'i'), ("L",'i'),("beta", 'd'), ("Nconf",'i8')])
+from tables_base import table_start, table_end
 
 outdir = os.environ.get('TABLES_DIR', '.')
 
@@ -39,6 +16,17 @@ final = np.empty(0, dtype=fdtype)
 
 TE=float(sys.argv[1])
 WE=float(sys.argv[2])
+
+table4_content = []
+
+outfile = open(f'{outdir}/chi_vs_t0_{TE}_w0_{WE}_scaled.dat', 'w')
+print(table_start.format(columnspec='|cccccc|'), file=outfile)
+print(r'$N_c$ & $\beta$ & $\sigma t_0$ & $\chi_L t_0^2 \cdot 10^4$ &'
+      r'$\sigma w_0^2$ & $\chi_L w_0^4 \cdot 10^4$ \\',
+      file=outfile)
+
+old_iN = None
+
 for fname in sys.argv[3:]:
     iN, iL, iB, rawdata = es.topo_load_raw_data(fname)
 
@@ -90,12 +78,23 @@ for fname in sys.argv[3:]:
                         WE_scaled,
                          w0_tmp_symE[0], w0_tmp_symE[1],
                          s_TC_w_avg, s_TC_w_err)
-    print("$",iN,"$  &  $",iL,"$  &  $",Nconfs,"$  &  $", iB,"$  &  $", 
-                        sqrtS,"$  &  $",sqrtS_err, "$  &  $",
-                        TE_scaled,"$  &  $",
-                        '{:.2uS}'.format(ufloat(t0_tmp_symE[0], t0_tmp_symE[1])),"$  &  $",
-                         '{:.2uS}'.format(ufloat(s_TC_avg, s_TC_err)),"$  &  $",
-                        WE_scaled,"$  &  $",
-                         '{:.2uS}'.format(ufloat(w0_tmp_symE[0], w0_tmp_symE[1])),"$  &  $",
-                         '{:.2uS}'.format(ufloat(s_TC_w_avg, s_TC_w_err)),"$ \\\\", 
-                        file=open(outdir + "/table_chi_t0_w0.tex", "a"))
+
+    if iN != old_iN:
+        print(r'\hline', file=outfile)
+        old_iN = iN
+
+    sqrtS_uf = ufloat(sqrtS, sqrtS_err)
+    t0_uf = ufloat(*t0_tmp_symE)
+    w0_uf = ufloat(*w0_tmp_symE)
+    chi_t_uf = ufloat(s_TC_avg, s_TC_err) / int(iL) ** 4
+    chi_w_uf = ufloat(s_TC_w_avg, s_TC_w_err) / int(iL) ** 4
+    breakpoint()
+
+    print(f'${iN}$ & ${iB}$ & ${sqrtS_uf * t0_uf:.2uS}$ & '
+          f'${chi_t_uf * t0_uf ** 2 * 1e4:.2uS}$ & '
+          f'${sqrtS_uf * w0_uf ** 2:.2uS}$ '
+          f'& ${chi_w_uf * w0_uf ** 4 * 1e4:.2uS}$ \\\\',
+          file=outfile)
+
+print(table_end, file=outfile)
+outfile.close()
