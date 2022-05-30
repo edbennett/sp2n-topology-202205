@@ -7,9 +7,10 @@ import pickle as pkl
 
 from tables_base import table_start, table_end
 
+quoteddir = os.environ.get('QUOTED_DIR', '.')
 outdir = os.environ.get('TABLES_DIR', '.')
 
-sqrts_data = np.genfromtxt('sqrts_vs_beta.dat', usecols=(0,1,3,4,5), dtype=[("N",'i'), ("L",'i'), ("beta",'d'),('sqrts','d'),('sqrts_err','d')]) 
+sqrts_data = np.genfromtxt(quoteddir + '/sqrts_vs_beta.dat', usecols=(0,1,3,4,5), dtype=[("N",'i'), ("L",'i'), ("beta",'d'),('sqrts','d'),('sqrts_err','d')])
 
 fdtype = np.dtype([("N",'i'), ("L",'i'), ("Nconf",'i8'),("beta", 'd'),("TE",'f8'),("scale",'d'),("scale_err",'d'),("chiTC",'d'),("chiTC_err",'d')])
 final = np.empty(0, dtype=fdtype)

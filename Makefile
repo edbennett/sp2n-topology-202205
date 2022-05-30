@@ -127,7 +127,7 @@ FIG11_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 
 TAB45_OUTPUT = ${TABLES_DIR}/table_chi_t0_${TE}_w0_${WE}.tex
 ${TABLES_DIR}/table_chi_t0_%.tex ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX})) | $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW})) ${TABLES_DIR}
-	TABLES_DIR=${TABLES_DIR} python src/Topology.py $(subst _w0_, ,$*) $^ > ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
+	TABLES_DIR=${TABLES_DIR} QUOTED_DIR=${QUOTED_DIR} python src/Topology.py $(subst _w0_, ,$*) $^ > ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
 ${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${PROC_DIR}/clim_SP_%.dat : ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR}
