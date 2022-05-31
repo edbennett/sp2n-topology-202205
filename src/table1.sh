@@ -19,8 +19,8 @@ for j in 2 4 6 8; do
 	for i in $(grep "^${j}" ${DATA_DIR}/DATA_FILES | cut -d, -f5)
     do
 		python src/Topo_binning.py ${TE} ${WE} ${PROC_DIR}/$i >> tmp0_tauQ
-		grep "${i}\$" ${DATA_DIR}/DATA_FILES | cut -d, -f4 | paste -d" " tmp0_tauQ <(grep -c 0\\.000000 ${PROC_DIR}/${i}) - > tmp1_tauQ
-		awk '{print "$"$1"$ & $"$2"$ & $"$3"$ & $"$5"$ & $"$6"$ & $"$4"$ \\\\"}' tmp1_tauQ >> ${OUTPUT_FILE}
+	    paste -d" " tmp0_tauQ <(grep -c 0\\.000000 ${PROC_DIR}/${i}) - > tmp1_tauQ
+		awk '{print "$"$1"$ & $"$2"$ & $"$3"$ & $"$4"$ & $"$6"$ & $"$5"$ \\\\"}' tmp1_tauQ >> ${OUTPUT_FILE}
 		rm tmp0_tauQ tmp1_tauQ
 	done
 done

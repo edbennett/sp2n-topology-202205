@@ -27,7 +27,7 @@ args = parser.parse_args()
 marks = itertools.cycle( ("v" , "s" , "^" ))
 
 rawdata = np.genfromtxt(args.infile,
-                        usecols=(0,1,2,3,4,5,6),
+                        usecols=(0, 2, 3, 4, 5, 6, 7),
                         names=['N', 'beta','Nupd', 't', 'st','tQ', 'stQ'])
 
 print(rawdata)

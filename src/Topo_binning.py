@@ -1,3 +1,4 @@
+import csv
 import os
 import sys
 import numpy as np
@@ -63,7 +64,17 @@ def binned_std(din, bin_size):
 #
 #print(binned_res)
 
+DATA_DIR = os.environ.get('DATA_DIR', '.')
 PROC_DIR = os.environ.get('PROC_DIR', '.')
+
+def get_n_sw(N, L, beta):
+    with open(DATA_DIR + '/DATA_FILES', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if row[0] == N and row[1] == L and row[2] == beta:
+                return int(row[3])
+    raise ValueError(f'{N}, {L}, {beta} not found in DATA_FILES')
+
 
 bin_range=np.arange(1,100,1)
 
@@ -92,8 +103,9 @@ for fname in sys.argv[3:]:
     TC = es.find_TC(TCdata, t0_tmp_symE[0])
     autC, autC_err = es.autocorr(TC)
     tmp=ufloat(autC, autC_err)
-    print(N,L,beta, t0_tmp_symE[0], t0_tmp_symE[1], autC,autC_err, file=f)
-    print(N,L,beta, '{:.2uS}'.format(tmp))
+    n_sw = get_n_sw(N, L, beta)
+    print(N,L,beta, n_sw, t0_tmp_symE[0], t0_tmp_symE[1], autC,autC_err, file=f)
+    print(N,L,beta, n_sw, '{:.2uS}'.format(tmp))
 
     plt.figure()
     plt.ylim(0.0,5.0)
@@ -111,8 +123,8 @@ for fname in sys.argv[3:]:
     plt.plot( bin_range, binned_res, label=lab)
     name_postfix=name_postfix+beta
     plt.legend(frameon=False)
-    #fname_out='binning_aut_'+str(N)+name_postfix+'.pdf'
-    #plt.savefig('draft_topology/figures/'+fname_out)
+    fname_out='binning_aut_'+str(N)+name_postfix+'.pdf'
+    plt.savefig(PROC_DIR + '/' + fname_out)
     #plt.show()
 
 
