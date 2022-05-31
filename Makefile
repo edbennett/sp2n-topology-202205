@@ -43,7 +43,7 @@ $(foreach SUFFIX, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_%_${SUFFIX}) &: ${
 TAB1_OUTPUT = ${TABLES_DIR}/table_tauQ_t0_${TE}_w0_${WE}.tex
 TAB1_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX})
 ${TABLES_DIR}/table_tauQ_t0_%.tex ${PROC_DIR}/tauQ_vs_t0_%.dat &: ${TAB1_DEPS} | ${TABLES_DIR}
-	PROC_DIR=${PROC_DIR} bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TAB1_OUTPUT}
+	PROC_DIR=${PROC_DIR} DATA_DIR=${DATA_DIR} bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TAB1_OUTPUT}
 
 # Figure 1
 NON_SCALED_SUFFIXES_6 = 16_15.9 16_16.1
@@ -60,14 +60,14 @@ FIG14_OUTPUT = ${PLOT_DIR}/Scale_4_t0.pdf
 FIG15_OUTPUT = ${PLOT_DIR}/Scale_4_w0.pdf
 FIG16_OUTPUT = ${PLOT_DIR}/Scale_8_t0.pdf
 FIG17_OUTPUT = ${PLOT_DIR}/Scale_8_w0.pdf
-TAB2_OUTPUT = ${TABLES_DIR}/Scale_6_t0.dat
-TAB3_OUTPUT = ${TABLES_DIR}/Scale_6_w0.dat
-TAB7_OUTPUT = ${TABLES_DIR}/Scale_2_t0.dat
-TAB8_OUTPUT = ${TABLES_DIR}/Scale_2_w0.dat
-TAB9_OUTPUT = ${TABLES_DIR}/Scale_4_t0.dat
-TAB10_OUTPUT = ${TABLES_DIR}/Scale_4_w0.dat
-TAB11_OUTPUT = ${TABLES_DIR}/Scale_8_t0.dat
-TAB12_OUTPUT = ${TABLES_DIR}/Scale_8_w0.dat
+TAB2_OUTPUT = ${TABLES_DIR}/Scale_6_t0.tex
+TAB3_OUTPUT = ${TABLES_DIR}/Scale_6_w0.tex
+TAB7_OUTPUT = ${TABLES_DIR}/Scale_2_t0.tex
+TAB8_OUTPUT = ${TABLES_DIR}/Scale_2_w0.tex
+TAB9_OUTPUT = ${TABLES_DIR}/Scale_4_t0.tex
+TAB10_OUTPUT = ${TABLES_DIR}/Scale_4_w0.tex
+TAB11_OUTPUT = ${TABLES_DIR}/Scale_8_t0.tex
+TAB12_OUTPUT = ${TABLES_DIR}/Scale_8_w0.tex
 
 FIG2_NC2_SUFFIXES = 20_2.55 24_2.60 32_2.65 32_2.70
 FIG2_NC4_SUFFIXES = $(foreach BETA, 7.7 7.72 7.76 7.78 7.80 7.85, 20_${BETA})
@@ -82,8 +82,8 @@ FIG2_PICKLE_DEPS = $(foreach SUFFIX,${FIG2_NC$1_SUFFIXES},$(foreach VAR,t_E w_E 
 ${PROC_DIR}/Scale_%.dat ${PLOT_DIR}/Scale_%_t0.pdf ${PLOT_DIR}/Scale_%_w0.pdf &: $$(call FIG2_RAW_DEPS,$$*) $$(call FIG2_PICKLE_DEPS,$$*) | ${PROC_DIR} ${PLOT_DIR}
 	python src/vis_WF_Scale.py $(call FIG2_RAW_DEPS,$*) --t0_plot_filename ${PLOT_DIR}/Scale_$*_t0.pdf --w0_plot_filename ${PLOT_DIR}/Scale_$*_w0.pdf > ${PROC_DIR}/Scale_$*.dat
 
-${TABLES_DIR}/Scale_%_t0.dat ${TABLES_DIR}/Scale_%_w0.dat &: ${PROC_DIR}/Scale_%.dat | ${TABLES_DIR}
-	bash src/tabulate_scale.sh $< ${TABLES_DIR}/Scale_$*_t0.dat ${TABLES_DIR}/Scale_$*_w0.dat
+${TABLES_DIR}/Scale_%_t0.tex ${TABLES_DIR}/Scale_%_w0.tex &: ${PROC_DIR}/Scale_%.dat | ${TABLES_DIR}
+	bash src/tabulate_scale.sh $< ${TABLES_DIR}/Scale_$*_t0.tex ${TABLES_DIR}/Scale_$*_w0.tex
 
 # Figure 3, 4
 FIG3_OUTPUT = ${PLOT_DIR}/flows_${TE_DEMO}_${WE_DEMO}_scaled.pdf
@@ -98,7 +98,7 @@ ${PLOT_DIR}/flows_%_scaled.pdf : ${FIG3_4_ARGS} ${FIG3_4_REQS} | ${PLOT_DIR}
 # Figure 5
 FIG5_OUTPUT = ${PLOT_DIR}/TCvst_8_16_26.7.pdf
 
-${PLOT_DIR}/TCvst_%.pdf : ${PROC_DIR}/WF_% | ${PLOT_DIR}
+${PLOT_DIR}/TCvst_%.pdf : ${PROC_DIR}/WF_% | $$(foreach FLOW, t_E w_E t_symE w_symE, $${PICKLE_DIR}/pkl_bs_$$*_$${FLOW}) ${PLOT_DIR}
 	PLOT_DIR=${PLOT_DIR} python src/Topo_t.py ${TE} ${WE} $^
 
 # Figure 6, 7, 8, 9
@@ -125,13 +125,17 @@ FIG11_NC6_SUFFIXES = 18_15.75 16_15.9 16_16.1 20_16.3
 FIG11_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 
 
-TAB45_OUTPUT = ${TABLES_DIR}/table_chi_t0_${TE}_w0_${WE}.tex
-${TABLES_DIR}/table_chi_t0_%.tex ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX})) | $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW})) ${TABLES_DIR}
+TAB45_OUTPUT = ${TABLES_DIR}/table_chi_${TE}_${WE}.tex
+${PROC_DIR}/chi_vs_t0_%_scaled.dat &: $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX})) | $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW})) ${TABLES_DIR}
 	TABLES_DIR=${TABLES_DIR} QUOTED_DIR=${QUOTED_DIR} python src/Topology.py $(subst _w0_, ,$*) $^ > ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
-${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${PROC_DIR}/clim_SP_%.dat : ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR}
-	PLOT_DIR=${PLOT_DIR} python src/Topology_contlim.py $^ ${PROC_DIR}/clim_SP_$*.dat
+${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${TABLES_DIR}/table_chi_%.tex ${PROC_DIR}/clim_SP_%.dat $(foreach FLOW, t0 w0, ${PROC_DIR}/clim_table_${FLOW}_%.tex) : ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR} ${TABLES_DIR}
+	python src/Topology_contlim.py $^ --clim_data_file ${PROC_DIR}/clim_SP_$*.dat --t0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled.pdf --w0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled_w0.pdf --beta_table_file ${TABLES_DIR}/table_chi_$*.tex --cont_t0_table_file ${PROC_DIR}/clim_table_t0_$*.tex --cont_w0_table_file ${PROC_DIR}/clim_table_w0_$*.tex
+
+TAB6_OUTPUT = ${TABLES_DIR}/table_clim.tex
+${TAB6_OUTPUT} : $(foreach FLOW, t0 w0, $(foreach SCALE, 0.225 0.5, ${PROC_DIR}/clim_table_${FLOW}_${SCALE}_${SCALE}.tex)) | ${TABLES_DIR}
+	bash src/table6.sh $^ > $@
 
 SHORT_FIGS = ${SHORT_PLOT_DIR}/ScaledChi.pdf ${SHORT_PLOT_DIR}/NONScaledChi.pdf
 SHORT_TABLE = ${SHORT_TABLES_DIR}/summary_table.tex

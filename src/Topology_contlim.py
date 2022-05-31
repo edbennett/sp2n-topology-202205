@@ -1,5 +1,4 @@
-import os
-import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import re
@@ -10,6 +9,8 @@ import itertools
 import lib_topology as es
 from scipy.optimize import curve_fit
 from uncertainties import ufloat,umath
+
+from tables_base import table_start, table_end
 
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Computer Modern Roman']
@@ -22,7 +23,15 @@ plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=8)
 #plt.style.use('classic')
 
-outdir = os.environ.get('PLOT_DIR', '.')
+parser = argparse.ArgumentParser()
+parser.add_argument('summary_data_filename')
+parser.add_argument('--t0_plot_filename', default=None)
+parser.add_argument('--w0_plot_filename', default=None)
+parser.add_argument('--beta_table_file', type=argparse.FileType('w'), default='-')
+parser.add_argument('--cont_t0_table_file', type=argparse.FileType('w'), default='-')
+parser.add_argument('--cont_w0_table_file', type=argparse.FileType('w'), default='-')
+parser.add_argument('--clim_data_file', type=argparse.FileType('w'), default='-')
+args = parser.parse_args()
 
 marks = itertools.cycle( ("v" , "s" , "^" ))
 #@ticker.FuncFormatter
@@ -39,17 +48,12 @@ def g(x,a,b,c):
     return a+b*x+c*x**2
 
 
-faddr = sys.argv[1]
-outfile = sys.argv[2] if (len(sys.argv) > 1) else sys.stdout
-
 patt = re.compile(r"chi_vs_t0_([0-9]+.[0-9]+)_w0_([0-9]+.[0-9]+)_([a-z]+).dat")
-t0, w0, labf, = patt.search(faddr).groups()
-print(t0,w0,labf)
-chi_SPN = np.genfromtxt(faddr,
+t0, w0, labf, = patt.search(args.summary_data_filename).groups()
+
+chi_SPN = np.genfromtxt(args.summary_data_filename,
                         usecols=(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15),
                         names=['N','L','nconf','beta','sqrtS','sqrtS_err','TE', 'tscale', 'tscale_err','chi_t', 'schi_t','WE', 'wscale', 'wscale_err','chi_w', 'schi_w'])
-
-print("#N chi(0) err coeff err chi2")
 
 plt.figure()
 plt.xlabel(r'$a^2/t_0$')
@@ -60,6 +64,22 @@ plt.ylabel(r'$\chi_L t_0^2$')
 
 dtclim=np.dtype([('N','i'),('chi','d'),('chi_err','d'),('sl','d'),('sl_err','d'),('chi2','d')])
 clim = np.empty(0, dtype=dtclim)
+
+t_exponent = -int(np.floor(np.log10(np.mean(
+    chi_SPN['chi_t'] * chi_SPN['tscale'] ** 2 / chi_SPN['L'] ** 4
+))))
+w_exponent = -int(np.floor(np.log10(np.mean(
+    chi_SPN['chi_w'] * chi_SPN['wscale'] ** 4 / chi_SPN['L'] ** 4
+))))
+
+print(table_start.format(columnspec='|cccccc|'), file=args.beta_table_file)
+print(
+    (r'$N_c$ & $\beta$ & $\sigma t_0$ & $\chi_L t_0^2 \cdot 10^{t_exponent}$ &'
+     + r'$\sigma w_0^2$ & $\chi_L w_0^4 \cdot 10^{w_exponent}$ \\').format(
+         t_exponent=t_exponent, w_exponent=w_exponent
+     ),
+    file=args.beta_table_file
+)
 
 for i in np.unique(chi_SPN['N']):
     pl_data = np.compress( chi_SPN['N'] == i, chi_SPN)
@@ -73,19 +93,23 @@ for i in np.unique(chi_SPN['N']):
     ydata_w0_err = np.sqrt( (4.*pl_data['chi_w']*pl_data['wscale']**3*pl_data['wscale_err'])**2
                         + (pl_data['schi_w']*pl_data['wscale']**4)**2)/pl_data['L']**4
 
+    print(r'\hline', file=args.beta_table_file)
     for l in range(len(xdata_t0)):
-        val_t0 = 10**3*ufloat(ydata_t0[l], ydata_t0_err[l])
+        val_t0 = 10**t_exponent * ufloat(ydata_t0[l], ydata_t0_err[l])
         uval_sqrtS_t0 = ufloat(pl_data['sqrtS'][l]**2.*pl_data['tscale'][l], 
             np.sqrt( (2.*pl_data['sqrtS'][l]*pl_data['sqrtS_err'][l]*pl_data['tscale'][l])**2 + (pl_data['sqrtS'][l]**2*pl_data['tscale_err'][l])**2 ))
-        val_w0 = 10**4*ufloat(ydata_w0[l],ydata_w0_err[l])
+        val_w0 = 10**w_exponent * ufloat(ydata_w0[l],ydata_w0_err[l])
         uval_sqrtS_w0 = ufloat(pl_data['sqrtS'][l]**2.*pl_data['wscale'][l]**2, 
             np.sqrt( (2.*pl_data['sqrtS'][l]*pl_data['sqrtS_err'][l]*pl_data['wscale'][l]**2)**2 + (pl_data['sqrtS'][l]**2*2.*pl_data['wscale'][l]*pl_data['wscale_err'][l])**2 ))
         print("$", int(pl_data['N'][l]),"$ & $", pl_data['beta'][l],"$ & $", 
                 '{:.2uS}'.format(uval_sqrtS_t0), "$ & $", 
                 '{:.2uS}'.format(val_t0), "$ & $", 
                 '{:.2uS}'.format(uval_sqrtS_w0), "$ & $", 
-                '{:.2uS}'.format(val_w0), '$ \\\\')
-    
+                '{:.2uS}'.format(val_w0), '$ \\\\',
+              file=args.beta_table_file)
+print(table_end, file=args.beta_table_file)
+args.beta_table_file.close()
+
 #Continuum extrapolations using the t scale
 for i in np.unique(chi_SPN['N']):
     pl_data = np.compress( chi_SPN['N'] == i, chi_SPN)
@@ -117,8 +141,19 @@ for i in np.unique(chi_SPN['N']):
     
 plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
 plt.tight_layout()
-plt.savefig(outdir + '/SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'.pdf')
-#plt.show()
+if args.t0_plot_filename:
+    plt.savefig(args.t0_plot_filename)
+    plt.close(plt.gcf())
+else:
+    plt.show()
+
+for i in clim['N']:
+    table_fits = np.compress(clim['N']==i, clim)
+    val = ufloat(table_fits['chi'], table_fits['chi_err'])
+    c2 = np.around( table_fits['chi2'],2)[0]
+    print('& ${:.2uS}$ & ${:.2f}$'.format(val, c2), file=args.cont_t0_table_file)
+
+
 
 plt.figure()
 plt.xlabel(r'$a^2/w_0^2$')
@@ -170,17 +205,21 @@ for i in clim['N']:
     table_fits = np.compress(clim['N']==i, clim)
     val = ufloat(table_fits['chi'], table_fits['chi_err'])
     c2 = np.around( table_fits['chi2'],2)[0]
-    print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
+    print('& ${:.2uS}$ & ${:.2f}$'.format(val, c2), file=args.cont_w0_table_file)
 
 #plt.legend(loc=1, ncol=2, frameon=False)
 plt.legend(bbox_to_anchor=(0.,1.0), loc='lower left', ncol=2, frameon=False)
 plt.tight_layout()
-plt.savefig(outdir + '/SPN_Topology_contlim_'+str(t0)+'_'+str(w0)+'_'+labf+'_w0.pdf')
-#plt.show()
+if args.w0_plot_filename:
+    plt.savefig(args.w0_plot_filename)
+    plt.close(plt.gcf())
+else:
+    plt.show()
 
 plt.figure()
 plt.xlabel(r'$\sigma a^2$')
 plt.ylabel(r'$\chi_L /\sigma^2$')
+
 clim = np.empty(0, dtype=dtclim)
 for i in np.unique(chi_SPN['N']):
     pl_data = np.compress( chi_SPN['N'] == i, chi_SPN)
@@ -230,10 +269,9 @@ for i in clim['N']:
     print("     coefficient = ", '{:.2uS}'.format(val))
     print("     chi^2 = ", np.around(table_fits['chi2'],2))
 
-with open(outfile, 'w') as f:
-    for i in clim['N']:
-        table_fits = np.compress(clim['N']==i, clim)
-        val = ufloat(table_fits['chi'], table_fits['chi_err'])
-        c2 = np.around( table_fits['chi2'],2)[0]
-        print('${:d}$ & ${:.2uS}$ & ${:f}$ \\\\'.format( i, val, c2 ))
-        print(i, table_fits['chi'][0], table_fits['chi_err'][0], file=f)
+for i in clim['N']:
+    table_fits = np.compress(clim['N']==i, clim)
+    val = ufloat(table_fits['chi'], table_fits['chi_err'])
+    c2 = np.around( table_fits['chi2'],2)[0]
+    print('${}$ & ${:.2uS}$ & ${:.2f}$ \\\\'.format(i, val, c2))
+    print(i, table_fits['chi'][0], table_fits['chi_err'][0], file=args.clim_data_file)
