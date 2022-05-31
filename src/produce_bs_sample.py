@@ -13,10 +13,13 @@ import pickle as pkl
 
 for faddr in sys.argv[1:]:
     N,L,beta,rawdata=es.topo_load_raw_data(faddr)
+
+    # Seed RNG with file address to get reproducible output
+    rng = np.random.default_rng(abs(hash(faddr)))
     
     fn_pkl='pkl_flows_bs/pkl_bs_'+N+'_'+L+'_'+beta+'_'
 
-    bs_flow_E, w0_flow_E = es.flows(rawdata, 100, 't2E')
+    bs_flow_E, w0_flow_E = es.flows(rawdata, 100, 't2E', rng=rng)
 
     fn_t_E = open(fn_pkl+'t_E','wb')
     pkl.dump(bs_flow_E, fn_t_E)
@@ -26,7 +29,7 @@ for faddr in sys.argv[1:]:
     pkl.dump(w0_flow_E, fn_w_E)
     fn_w_E.close()
 
-    bs_flow_symE, w0_flow_symE = es.flows(rawdata, 100, 't2symE')
+    bs_flow_symE, w0_flow_symE = es.flows(rawdata, 100, 't2symE', rng=rng)
 
     fn_t_symE = open(fn_pkl+'t_symE','wb')
     pkl.dump(bs_flow_symE, fn_t_symE)

@@ -158,7 +158,7 @@ def find_w0(indata, TE):
     return a,c
 rng = np.random.default_rng()
 #
-def flows(rawdata, N_bs, obs, Ntherm=500):
+def flows(rawdata, N_bs, obs, Ntherm=500, rng=rng):
     Nconf = np.max(np.unique(rawdata['nconf']))
     rawdata['t'] = np.around(rawdata['t'],8)
     ts = np.unique(rawdata['t'])
