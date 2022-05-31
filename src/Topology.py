@@ -5,8 +5,6 @@ from uncertainties import ufloat
 import lib_topology as es
 import pickle as pkl
 
-from tables_base import table_start, table_end
-
 quoteddir = os.environ.get('QUOTED_DIR', '.')
 outdir = os.environ.get('TABLES_DIR', '.')
 
@@ -17,16 +15,6 @@ final = np.empty(0, dtype=fdtype)
 
 TE=float(sys.argv[1])
 WE=float(sys.argv[2])
-
-table4_content = []
-
-outfile = open(f'{outdir}/chi_vs_t0_{TE}_w0_{WE}_scaled.dat', 'w')
-print(table_start.format(columnspec='|cccccc|'), file=outfile)
-print(r'$N_c$ & $\beta$ & $\sigma t_0$ & $\chi_L t_0^2 \cdot 10^4$ &'
-      r'$\sigma w_0^2$ & $\chi_L w_0^4 \cdot 10^4$ \\',
-      file=outfile)
-
-old_iN = None
 
 for fname in sys.argv[3:]:
     iN, iL, iB, rawdata = es.topo_load_raw_data(fname)
@@ -80,22 +68,12 @@ for fname in sys.argv[3:]:
                          w0_tmp_symE[0], w0_tmp_symE[1],
                          s_TC_w_avg, s_TC_w_err)
 
-    if iN != old_iN:
-        print(r'\hline', file=outfile)
-        old_iN = iN
-
-    sqrtS_uf = ufloat(sqrtS, sqrtS_err)
-    t0_uf = ufloat(*t0_tmp_symE)
-    w0_uf = ufloat(*w0_tmp_symE)
-    chi_t_uf = ufloat(s_TC_avg, s_TC_err) / int(iL) ** 4
-    chi_w_uf = ufloat(s_TC_w_avg, s_TC_w_err) / int(iL) ** 4
-    breakpoint()
-
-    print(f'${iN}$ & ${iB}$ & ${sqrtS_uf * t0_uf:.2uS}$ & '
-          f'${chi_t_uf * t0_uf ** 2 * 1e4:.2uS}$ & '
-          f'${sqrtS_uf * w0_uf ** 2:.2uS}$ '
-          f'& ${chi_w_uf * w0_uf ** 4 * 1e4:.2uS}$ \\\\',
-          file=outfile)
-
-print(table_end, file=outfile)
-outfile.close()
+    print("$",iN,"$  &  $",iL,"$  &  $",Nconfs,"$  &  $", iB,"$  &  $",
+                        sqrtS,"$  &  $",sqrtS_err, "$  &  $",
+                        TE_scaled,"$  &  $",
+                         '{:.2uS}'.format(ufloat(t0_tmp_symE[0], t0_tmp_symE[1])),"$  &  $",
+                         '{:.2uS}'.format(ufloat(s_TC_avg, s_TC_err)),"$  &  $",
+                        WE_scaled,"$  &  $",
+                         '{:.2uS}'.format(ufloat(w0_tmp_symE[0], w0_tmp_symE[1])),"$  &  $",
+                         '{:.2uS}'.format(ufloat(s_TC_w_avg, s_TC_w_err)),"$ \\\\",
+                        file=open(outdir + "/table_chi_t0_w0.tex", "a"))
