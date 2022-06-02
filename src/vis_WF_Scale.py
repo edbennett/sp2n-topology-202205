@@ -116,20 +116,28 @@ for TE in e0_list:
             t0_tmp_symE = np.nan
             w0_tmp_symE = np.nan
 
+        print(N, L, beta, TE_scaled, end=" ")
+        to_print = []
         try:
-            print(N, L, beta, TE_scaled, end=" ")
             for v in [t0_tmp_E, t0_tmp_symE]:
                 pr = ufloat(np.sqrt(v[0]), v[1] / (2.0 * np.sqrt(v[0])))
-                print("{:.2uS}".format(pr), end=" ")
+                to_print.append("{:.2uS}".format(pr))
+        except:
+            to_print = ["-", "-"]
+        finally:
+            print(" ".join(to_print), end=" ")
 
-            print(WE_scaled, end=" ")
+        print(WE_scaled, end=" ")
+        to_print = []
+        try:
             for v in [w0_tmp_E, w0_tmp_symE]:
                 pr = ufloat(np.sqrt(v[0]), v[1] / (2.0 * np.sqrt(v[0])))
-                print("{:.2uS}".format(pr), end=" ")
-            print("")
+                to_print.append("{:.2uS}".format(pr))
         except:
-            print("")
-            continue
+            to_print = ["-", "-"]
+        finally:
+            print(" ".join(to_print), end=" ")
+        print("")
 
 
 plt.figure()
