@@ -157,9 +157,9 @@ for e0 in e0_list:
     plt.errorbar(
         xdata, ydata, yerr=ydata_err, linestyle="None", marker="o", color=color1
     )
-    errorbar(
-        [np.nan], [np.nan], yerr=[np.nan], color="black", fmt="^", label=r"plaquette"
-    )
+plt.errorbar(
+    [np.nan], [np.nan], yerr=[np.nan], color="black", fmt="^", label=r"plaquette"
+)
 plt.errorbar([np.nan], [np.nan], yerr=[np.nan], color="black", fmt="o", label=r"clover")
 
 plt.tight_layout()
