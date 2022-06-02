@@ -1,15 +1,20 @@
-import os
-import sys
+import argparse
 import numpy as np
 from uncertainties import ufloat
 import lib_topology as es
 import pickle as pkl
 
-quoteddir = os.environ.get("QUOTED_DIR", ".")
-outdir = os.environ.get("TABLES_DIR", ".")
+parser = argparse.ArgumentParser()
+parser.add_argument("TE", type=float)
+parser.add_argument("WE", type=float)
+parser.add_argument("input_datafiles", nargs="+")
+parser.add_argument("--output_data", type=argparse.FileType("w"), default="-")
+parser.add_argument("--output_tex", type=argparse.FileType("w"), default="-")
+parser.add_argument("--sqrt_sigma_filename", default="./sqrts_vs_beta.dat")
+args = parser.parse_args()
 
 sqrts_data = np.genfromtxt(
-    quoteddir + "/sqrts_vs_beta.dat",
+    args.sqrt_sigma_filename,
     usecols=(0, 1, 3, 4, 5),
     dtype=[("N", "i"), ("L", "i"), ("beta", "d"), ("sqrts", "d"), ("sqrts_err", "d")],
 )
@@ -29,18 +34,15 @@ fdtype = np.dtype(
 )
 final = np.empty(0, dtype=fdtype)
 
-TE = float(sys.argv[1])
-WE = float(sys.argv[2])
-
-for fname in sys.argv[3:]:
+for fname in args.input_datafiles:
     iN, iL, iB, rawdata = es.topo_load_raw_data(fname)
 
     tmp_sqrts = np.compress(sqrts_data["beta"] == float(iB), sqrts_data)
     sqrtS = tmp_sqrts["sqrts"][0]
     sqrtS_err = tmp_sqrts["sqrts_err"][0]
 
-    TE_scaled = TE * es.Casimir_SP(iN)
-    WE_scaled = WE * es.Casimir_SP(iN)
+    TE_scaled = args.TE * es.Casimir_SP(iN)
+    WE_scaled = args.WE * es.Casimir_SP(iN)
 
     fn_bs = "pkl_flows_bs/pkl_bs_" + iN + "_" + iL + "_" + iB + "_"
     infile = open(fn_bs + "t_E", "rb")
@@ -92,6 +94,7 @@ for fname in sys.argv[3:]:
         w0_tmp_symE[1],
         s_TC_w_avg,
         s_TC_w_err,
+        file=args.output_data,
     )
 
     print(
@@ -120,5 +123,5 @@ for fname in sys.argv[3:]:
         "$  &  $",
         "{:.2uS}".format(ufloat(s_TC_w_avg, s_TC_w_err)),
         "$ \\\\",
-        file=open(outdir + "/table_chi_t0_w0.tex", "a"),
+        file=args.output_tex,
     )
