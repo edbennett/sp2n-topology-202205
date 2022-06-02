@@ -134,7 +134,7 @@ ${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%
 	python src/Topology_contlim.py $^ --clim_data_file ${PROC_DIR}/clim_SP_$*.dat --t0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled.pdf --w0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled_w0.pdf --beta_table_file ${TABLES_DIR}/table_chi_$*.tex --cont_t0_table_file ${PROC_DIR}/clim_table_t0_$*.tex --cont_w0_table_file ${PROC_DIR}/clim_table_w0_$*.tex
 
 TAB6_OUTPUT = ${TABLES_DIR}/table_clim.tex
-${TAB6_OUTPUT} : $(foreach FLOW, t0 w0, $(foreach SCALE, 0.225 0.5, ${PROC_DIR}/clim_table_${FLOW}_${SCALE}_${SCALE}.tex)) | ${TABLES_DIR}
+${TAB6_OUTPUT} : $(foreach FLOW, t0 w0, $(foreach SCALE, ${TE} ${TE_DEMO}, ${PROC_DIR}/clim_table_${FLOW}_${SCALE}_${SCALE}.tex)) | ${TABLES_DIR}
 	bash src/table6.sh $^ > $@
 
 SHORT_FIGS = ${SHORT_PLOT_DIR}/ScaledChi.pdf ${SHORT_PLOT_DIR}/NONScaledChi.pdf
