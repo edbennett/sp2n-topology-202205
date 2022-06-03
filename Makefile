@@ -79,8 +79,8 @@ FIG2_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 FIG2_RAW_DEPS = $(foreach SUFFIX,${FIG2_NC$1_SUFFIXES},${PROC_DIR}/WF_$1_${SUFFIX})
 FIG2_PICKLE_DEPS = $(foreach SUFFIX,${FIG2_NC$1_SUFFIXES},$(foreach VAR,t_E w_E t_symE w_symE,${PICKLE_DIR}/pkl_bs_$1_${SUFFIX}_${VAR}))
 
-${PROC_DIR}/Scale_%.dat ${PLOT_DIR}/Scale_%_t0.pdf ${PLOT_DIR}/Scale_%_w0.pdf &: $$(call FIG2_RAW_DEPS,$$*) $$(call FIG2_PICKLE_DEPS,$$*) | ${PROC_DIR} ${PLOT_DIR}
-	python src/vis_WF_Scale.py $(call FIG2_RAW_DEPS,$*) --t0_plot_filename ${PLOT_DIR}/Scale_$*_t0.pdf --w0_plot_filename ${PLOT_DIR}/Scale_$*_w0.pdf > ${PROC_DIR}/Scale_$*.dat
+${PROC_DIR}/Scale_%.dat ${PLOT_DIR}/Scale_%_t0.pdf ${PLOT_DIR}/Scale_%_w0.pdf ${PROC_DIR}/Scale_%.csv &: $$(call FIG2_RAW_DEPS,$$*) $$(call FIG2_PICKLE_DEPS,$$*) | ${PROC_DIR} ${PLOT_DIR}
+	python src/vis_WF_Scale.py $(call FIG2_RAW_DEPS,$*) --t0_plot_filename ${PLOT_DIR}/Scale_$*_t0.pdf --w0_plot_filename ${PLOT_DIR}/Scale_$*_w0.pdf --csv_file ${PROC_DIR}/Scale_$*.csv > ${PROC_DIR}/Scale_$*.dat
 
 ${TABLES_DIR}/Scale_%_t0.tex ${TABLES_DIR}/Scale_%_w0.tex &: ${PROC_DIR}/Scale_%.dat | ${TABLES_DIR}
 	bash src/tabulate_scale.sh $< ${TABLES_DIR}/Scale_$*_t0.tex ${TABLES_DIR}/Scale_$*_w0.tex
@@ -172,5 +172,13 @@ clean-all : clean clean-pickles
 all : all-figures all-tables
 
 datapackage : datapackage.h5
+
+scales.csv : $(foreach NC, 2 4 6 8, ${PROC_DIR}/Scale_${NC}.csv)
+	echo "Nc,L,beta,TE_scaled,t0_plaq,t0_plaq_err,t0_sym,t0_sym_err,WE_scaled,w0_plaq,w0_plaq_err,w0_sym,w0_sym_err" > $@
+	cat $^ >> $@
+
+csvs : scales.csv
+
+.PHONY : all csvs datapackage clean-all clean-pickls clean-processed clean-tables clean-plots clean all-tables all-figures short-tables short-figures long-tables long-figures
 
 .DEFAULT_GOAL := all

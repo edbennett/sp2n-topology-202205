@@ -1,6 +1,5 @@
-from argparse import ArgumentParser
-import sys
-import os
+from argparse import ArgumentParser, FileType
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from uncertainties import ufloat, unumpy
@@ -20,7 +19,11 @@ parser = ArgumentParser()
 parser.add_argument("files_to_process", nargs="+")
 parser.add_argument("--t0_plot_filename", default="t0_scale.pdf")
 parser.add_argument("--w0_plot_filename", default="w0_scale.pdf")
+parser.add_argument("--csv_file", type=FileType("w"), default=None)
 args = parser.parse_args()
+
+if args.csv_file:
+    csv_writer = csv.writer(args.csv_file)
 
 fdtype = np.dtype(
     [
@@ -118,12 +121,15 @@ for TE in e0_list:
 
         print(N, L, beta, TE_scaled, end=" ")
         to_print = []
+        csv_row = [N, L, beta, TE_scaled]
         try:
             for v in [t0_tmp_E, t0_tmp_symE]:
                 pr = ufloat(np.sqrt(v[0]), v[1] / (2.0 * np.sqrt(v[0])))
                 to_print.append("{:.2uS}".format(pr))
+                csv_row.extend([pr.n, pr.s])
         except:
             to_print = ["-", "-"]
+            csv_row.extend([None, None, None, None])
         finally:
             print(" ".join(to_print), end=" ")
 
@@ -133,11 +139,15 @@ for TE in e0_list:
             for v in [w0_tmp_E, w0_tmp_symE]:
                 pr = ufloat(np.sqrt(v[0]), v[1] / (2.0 * np.sqrt(v[0])))
                 to_print.append("{:.2uS}".format(pr))
+                csv_row.extend([pr.n, pr.s])
         except:
             to_print = ["-", "-"]
+            csv_row.extend([None, None, None, None])
         finally:
             print(" ".join(to_print), end=" ")
         print("")
+        if args.csv_file:
+            csv_writer.writerow(csv_row)
 
 
 plt.figure()
