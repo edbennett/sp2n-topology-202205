@@ -20,6 +20,9 @@ PROC_DIR = processed_data
 SHORT_PLOT_DIR = short_plots
 SHORT_TABLES_DIR = short_tables
 
+# Use full bash rather than POSIX-limited bash, to let redirects work
+SHELL := /bin/bash
+
 # Required to enable some of the more intricate array lookups
 .SECONDEXPANSION :
 
@@ -131,8 +134,8 @@ ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: ${CHI_VS_T0_DEPS} ${QUOTED_DIR}/sqrts_vs_b
 	python src/Topology.py $(subst _w0_, ,$*) ${CHI_VS_T0_DEPS} --sqrt_sigma_filename ${QUOTED_DIR}/sqrts_vs_beta.dat --output_data ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
-${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${TABLES_DIR}/table_chi_%.tex ${PROC_DIR}/clim_SP_%.dat $(foreach FLOW, t0 w0, ${PROC_DIR}/clim_table_${FLOW}_%.tex) : ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR} ${TABLES_DIR}
-	python src/Topology_contlim.py $^ --clim_data_file ${PROC_DIR}/clim_SP_$*.dat --t0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled.pdf --w0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled_w0.pdf --beta_table_file ${TABLES_DIR}/table_chi_$*.tex --cont_t0_table_file ${PROC_DIR}/clim_table_t0_$*.tex --cont_w0_table_file ${PROC_DIR}/clim_table_w0_$*.tex
+${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${TABLES_DIR}/table_chi_%.tex ${PROC_DIR}/clim_SP_%.dat $(foreach FLOW, t0 w0, ${PROC_DIR}/clim_table_${FLOW}_%.tex) ${PROC_DIR}/clim_SP_%.csv: ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR} ${TABLES_DIR}
+	python src/Topology_contlim.py $^ --clim_data_file ${PROC_DIR}/clim_SP_$*.dat --t0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled.pdf --w0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled_w0.pdf --beta_table_file ${TABLES_DIR}/table_chi_$*.tex --cont_t0_table_file ${PROC_DIR}/clim_table_t0_$*.tex --cont_w0_table_file ${PROC_DIR}/clim_table_w0_$*.tex --clim_csv_file ${PROC_DIR}/clim_SP_$*.csv
 
 TAB6_OUTPUT = ${TABLES_DIR}/table_clim.tex
 ${TAB6_OUTPUT} : $(foreach FLOW, t0 w0, $(foreach SCALE, ${TE} ${TE_DEMO}, ${PROC_DIR}/clim_table_${FLOW}_${SCALE}_${SCALE}.tex)) | ${TABLES_DIR}
@@ -176,6 +179,10 @@ datapackage : datapackage.h5
 scales.csv : $(foreach NC, 2 4 6 8, ${PROC_DIR}/Scale_${NC}.csv)
 	echo "Nc,L,beta,TE_scaled,t0_plaq,t0_plaq_err,t0_sym,t0_sym_err,WE_scaled,w0_plaq,w0_plaq_err,w0_sym,w0_sym_err" > $@
 	cat $^ >> $@
+
+cont_lim.csv : $(foreach SCALE, ${TE} ${TE_DEMO}, ${PROC_DIR}/clim_SP_${SCALE}_${SCALE}.csv)
+	echo "Nc,chitop_t0_square_${TE},chitop_t0_square_${TE}_err,chitop_t0_square_${TE}_chisquare,chitop_w0_fourth_${TE},chitop_w0_fourth_${TE}_err,chitop_w0_fourth_${TE}_chisquare,chitop_t0_square_${TE_DEMO},chitop_t0_square_${TE_DEMO}_err,chitop_t0_square_${TE_DEMO}_chisquare,chitop_w0_fourth_${TE_DEMO},chitop_w0_fourth_${TE_DEMO}_err,chitop_w0_fourth_${TE_DEMO}_chisquare" > $@
+	paste -d',' <(printf "2\n4\n6\n8\n") $^ >> $@
 
 csvs : scales.csv
 

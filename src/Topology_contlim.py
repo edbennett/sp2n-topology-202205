@@ -1,4 +1,5 @@
 import argparse
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import re
@@ -29,7 +30,12 @@ parser.add_argument("--beta_table_file", type=argparse.FileType("w"), default="-
 parser.add_argument("--cont_t0_table_file", type=argparse.FileType("w"), default="-")
 parser.add_argument("--cont_w0_table_file", type=argparse.FileType("w"), default="-")
 parser.add_argument("--clim_data_file", type=argparse.FileType("w"), default="-")
+parser.add_argument("--clim_csv_file", type=argparse.FileType("w"), default=None)
 args = parser.parse_args()
+
+clim_summary_data = {}
+if args.clim_csv_file:
+    csv_writer = csv.writer(args.clim_csv_file, lineterminator="\n")
 
 marks = itertools.cycle(("v", "s", "^"))
 
@@ -243,6 +249,7 @@ for i in clim["N"]:
     val = ufloat(table_fits["chi"], table_fits["chi_err"])
     c2 = np.around(table_fits["chi2"], 2)[0]
     print("& ${:.2uS}$ & ${:.2f}$".format(val, c2), file=args.cont_t0_table_file)
+    clim_summary_data[i] = [val.n, val.s, table_fits["chi2"][0]]
 
 
 plt.figure()
@@ -309,6 +316,7 @@ for i in clim["N"]:
     val = ufloat(table_fits["chi"], table_fits["chi_err"])
     c2 = np.around(table_fits["chi2"], 2)[0]
     print("& ${:.2uS}$ & ${:.2f}$".format(val, c2), file=args.cont_w0_table_file)
+    clim_summary_data[i].extend([val.n, val.s, table_fits["chi2"][0]])
 
 plt.legend(bbox_to_anchor=(0.0, 1.0), loc="lower left", ncol=2, frameon=False)
 plt.tight_layout()
@@ -383,3 +391,6 @@ for i in clim["N"]:
     c2 = np.around(table_fits["chi2"], 2)[0]
     print("${}$ & ${:.2uS}$ & ${:.2f}$ \\\\".format(i, val, c2))
     print(i, table_fits["chi"][0], table_fits["chi_err"][0], file=args.clim_data_file)
+
+if args.clim_csv_file:
+    csv_writer.writerows([v for _, v in sorted(clim_summary_data.items())])
