@@ -1,11 +1,12 @@
 # Ignore data, both source raw data, and generated results
-data/
-pkl_flows_bs/
-processed_data/
-plots/
-tables/
-short_plots/
-short_tables/
+/data/
+/pkl_flows_bs/
+/processed_data/
+/plots/
+/tables/
+/short_plots/
+/short_tables/
+/*.csv
 
 # GitHub boilerplate follows
 
