@@ -143,7 +143,7 @@ ${TAB6_OUTPUT} : $(foreach FLOW, t0 w0, $(foreach SCALE, ${TE} ${TE_DEMO}, ${PRO
 
 SHORT_FIGS = ${SHORT_PLOT_DIR}/ScaledChi.pdf ${SHORT_PLOT_DIR}/NONScaledChi.pdf
 SHORT_TABLE = ${SHORT_TABLES_DIR}/summary_table.tex
-${SHORT_FIGS} ${SHORT_TABLE} &: $(foreach AUTHORS,AA_MT DD_EV_HP CB_MD CB_CB_MD BL_MT,quoted_data/clim_SU_${AUTHORS}.dat) ${PROC_DIR}/clim_SP_${TE}_${WE}.dat | ${SHORT_PLOT_DIR} ${SHORT_TABLES_DIR}
+${SHORT_FIGS} ${SHORT_TABLE} universality.csv &: $(foreach AUTHORS,AA_MT DD_EV_HP CB_MD CB_CB_MD BL_MT,quoted_data/clim_SU_${AUTHORS}.dat) ${PROC_DIR}/clim_SP_${TE}_${WE}.dat | ${SHORT_PLOT_DIR} ${SHORT_TABLES_DIR}
 	PLOT_DIR=${SHORT_PLOT_DIR} TABLES_DIR=${SHORT_TABLES_DIR} PROC_DIR=${PROC_DIR} QUOTED_DIR=${QUOTED_DIR} python src/fits_largeN_universality.py
 
 datapackage.h5 : ${TAB1_DEPS} $(foreach PREFIX, ${TAB1_DEPS}, ${PREFIX}_plaq)
@@ -188,7 +188,7 @@ topology.csv : ${PROC_DIR}/tauQ_vs_t0_${TE}_w0_${WE}.dat ${PROC_DIR}/scaled_chi_
 	echo "Nc,L,beta,Nsw,tauQ,tauQ_err,Ntot,sigma_t0_${TE},sigma_t0_${TE}_err,chitop_t0_square_${TE},chitop_t0_square_${TE}_err,sigma_w0_square_${WE},sigma_w0_square_${WE}_err,chitop_w0_fourth_${WE},chitop_w0_fourth_${WE}_err,sigma_t0_${TE_DEMO},sigma_t0_${TE_DEMO}_err,chitop_t0_square_${TE_DEMO},chitop_t0_square_${TE_DEMO}_err,sigma_w0_square_${WE_DEMO},sigma_w0_square_${WE_DEMO}_err,chitop_w0_fourth_${WE_DEMO},chitop_w0_fourth_${WE_DEMO}_err" > $@
 	paste -d' ' <(cut -d' ' -f1-4,7-8 ${PROC_DIR}/tauQ_vs_t0_${TE}_w0_${WE}.dat) <(cut -d' ' -f3-11 ${PROC_DIR}/scaled_chi_${TE}_${WE}.dat) <(cut -d' ' -f4-11 ${PROC_DIR}/scaled_chi_${TE_DEMO}_${WE_DEMO}.dat) | tr ' ' ',' >> $@
 
-csvs : scales.csv cont_lim.csv topology.csv
+csvs : scales.csv cont_lim.csv topology.csv universality.csv
 
 .PHONY : all csvs datapackage clean-all clean-pickls clean-processed clean-tables clean-plots clean all-tables all-figures short-tables short-figures long-tables long-figures
 

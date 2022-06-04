@@ -1,3 +1,4 @@
+import csv
 import os
 import sys
 import numpy as np
@@ -26,6 +27,7 @@ outdir = os.environ.get("PLOT_DIR", ".")
 quoted_dir = os.environ.get("QUOTED_DIR", ".")
 processed_dir = os.environ.get("PROC_DIR", ".")
 tables_dir = os.environ.get("TABLES_DIR", ".")
+csv_dir = os.environ.get("CSV_DIR", ".")
 
 
 def f1(x, a, b):
@@ -294,6 +296,7 @@ def sort_key(tot):
     return label_order.index(tot["label"]), int(tot["N_c"])
 
 
+tabular_results = []
 with open(tables_dir + "/summary_table.tex", "w") as outfile:
     print(table_start.format(columnspec="cccc"), file=outfile)
     print(r"Group & Reference & $\chi/\sigma^2$ & $C_2(F)^2/d_G$ \\", file=outfile)
@@ -306,14 +309,19 @@ with open(tables_dir + "/summary_table.tex", "w") as outfile:
             prev_label = i["label"]
 
         print_val = ufloat(i["sc_chi"], i["sc_chi_err"])
+        Nc = int(i["N_c"])
         if i["label"] == "Bennett et al.":
-            scaling = np.around(scaling_SPN(int(i["N_c"])), 4)
-            group = f"$ Sp({int(i['N_c']) * 2})$"
+            group_family = "Sp"
+            scaling = np.around(scaling_SPN(Nc / 2), 4)
         else:
+            group_family = "SU"
             scaling = np.around(scaling_SUN(int(i["N_c"])), 4)
-            group = f"$ SU({int(i['N_c'])})$"
+        group_label = f"${group_family}({Nc})$"
+        tabular_results.append(
+            [group_family, Nc, i["label"], i["sc_chi"], i["sc_chi_err"], scaling]
+        )
         print(
-            group,
+            group_label,
             "&",
             i["label"],
             "\\cite{",
@@ -331,3 +339,17 @@ print(chi_total)
 plt.tight_layout()
 plt.legend(loc=2)
 plt.savefig(outdir + "/NONScaledChi.pdf")
+
+with open(csv_dir + "/universality.csv", "w") as out_csv:
+    writer = csv.writer(out_csv)
+    writer.writerow(
+        [
+            "group_family",
+            "Nc",
+            "reference",
+            "chi_over_sigma_square",
+            "chi_over_sigma_square_err",
+            "scaling_factor",
+        ]
+    )
+    writer.writerows(tabular_results)
