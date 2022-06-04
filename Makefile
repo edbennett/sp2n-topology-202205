@@ -46,7 +46,7 @@ $(foreach SUFFIX, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_%_${SUFFIX}) &: ${
 TAB1_OUTPUT = ${TABLES_DIR}/table_tauQ_t0_${TE}_w0_${WE}.tex
 TAB1_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX})
 ${TABLES_DIR}/table_tauQ_t0_%.tex ${PROC_DIR}/tauQ_vs_t0_%.dat &: ${TAB1_DEPS} | ${TABLES_DIR}
-	PROC_DIR=${PROC_DIR} DATA_DIR=${DATA_DIR} bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TAB1_OUTPUT}
+	bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TABLES_DIR}/table_tauQ_t0_$*.tex
 
 # Figure 1
 NON_SCALED_SUFFIXES_6 = 16_15.9 16_16.1

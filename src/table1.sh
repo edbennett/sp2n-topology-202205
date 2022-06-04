@@ -6,6 +6,9 @@ TE=$3
 WE=$4
 OUTPUT_FILE=$5
 
+export DATA_DIR
+export PROC_DIR
+
 rm -f tmp0_tauQ ${OUTPUT_FILE}
 
 cat > ${OUTPUT_FILE} <<EOF
