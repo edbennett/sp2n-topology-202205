@@ -134,8 +134,8 @@ ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: ${CHI_VS_T0_DEPS} ${QUOTED_DIR}/sqrts_vs_b
 	python src/Topology.py $(subst _w0_, ,$*) ${CHI_VS_T0_DEPS} --sqrt_sigma_filename ${QUOTED_DIR}/sqrts_vs_beta.dat --output_data ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
-${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${TABLES_DIR}/table_chi_%.tex ${PROC_DIR}/clim_SP_%.dat $(foreach FLOW, t0 w0, ${PROC_DIR}/clim_table_${FLOW}_%.tex) ${PROC_DIR}/clim_SP_%.csv: ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR} ${TABLES_DIR}
-	python src/Topology_contlim.py $^ --clim_data_file ${PROC_DIR}/clim_SP_$*.dat --t0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled.pdf --w0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled_w0.pdf --beta_table_file ${TABLES_DIR}/table_chi_$*.tex --cont_t0_table_file ${PROC_DIR}/clim_table_t0_$*.tex --cont_w0_table_file ${PROC_DIR}/clim_table_w0_$*.tex --clim_csv_file ${PROC_DIR}/clim_SP_$*.csv
+${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${TABLES_DIR}/table_chi_%.tex ${PROC_DIR}/scaled_chi_%.dat ${PROC_DIR}/clim_SP_%.dat $(foreach FLOW, t0 w0, ${PROC_DIR}/clim_table_${FLOW}_%.tex) ${PROC_DIR}/clim_SP_%.csv: ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR} ${TABLES_DIR}
+	python src/Topology_contlim.py $^ --clim_data_file ${PROC_DIR}/clim_SP_$*.dat --t0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled.pdf --w0_plot_file ${PLOT_DIR}/SPN_Topology_contlim_$*_scaled_w0.pdf --beta_table_file ${TABLES_DIR}/table_chi_$*.tex --beta_table_data_file ${PROC_DIR}/scaled_chi_$*.dat --cont_t0_table_file ${PROC_DIR}/clim_table_t0_$*.tex --cont_w0_table_file ${PROC_DIR}/clim_table_w0_$*.tex --clim_csv_file ${PROC_DIR}/clim_SP_$*.csv
 
 TAB6_OUTPUT = ${TABLES_DIR}/table_clim.tex
 ${TAB6_OUTPUT} : $(foreach FLOW, t0 w0, $(foreach SCALE, ${TE} ${TE_DEMO}, ${PROC_DIR}/clim_table_${FLOW}_${SCALE}_${SCALE}.tex)) | ${TABLES_DIR}
@@ -184,7 +184,11 @@ cont_lim.csv : $(foreach SCALE, ${TE} ${TE_DEMO}, ${PROC_DIR}/clim_SP_${SCALE}_$
 	echo "Nc,chitop_t0_square_${TE},chitop_t0_square_${TE}_err,chitop_t0_square_${TE}_chisquare,chitop_w0_fourth_${TE},chitop_w0_fourth_${TE}_err,chitop_w0_fourth_${TE}_chisquare,chitop_t0_square_${TE_DEMO},chitop_t0_square_${TE_DEMO}_err,chitop_t0_square_${TE_DEMO}_chisquare,chitop_w0_fourth_${TE_DEMO},chitop_w0_fourth_${TE_DEMO}_err,chitop_w0_fourth_${TE_DEMO}_chisquare" > $@
 	paste -d',' <(printf "2\n4\n6\n8\n") $^ >> $@
 
-csvs : scales.csv
+topology.csv : ${PROC_DIR}/tauQ_vs_t0_${TE}_w0_${WE}.dat ${PROC_DIR}/scaled_chi_${TE}_${WE}.dat ${PROC_DIR}/scaled_chi_${TE_DEMO}_${WE_DEMO}.dat
+	echo "Nc,L,beta,Nsw,tauQ,tauQ_err,Ntot,sigma_t0_${TE},sigma_t0_${TE}_err,chitop_t0_square_${TE},chitop_t0_square_${TE}_err,sigma_w0_square_${WE},sigma_w0_square_${WE}_err,chitop_w0_fourth_${WE},chitop_w0_fourth_${WE}_err,sigma_t0_${TE_DEMO},sigma_t0_${TE_DEMO}_err,chitop_t0_square_${TE_DEMO},chitop_t0_square_${TE_DEMO}_err,sigma_w0_square_${WE_DEMO},sigma_w0_square_${WE_DEMO}_err,chitop_w0_fourth_${WE_DEMO},chitop_w0_fourth_${WE_DEMO}_err" > $@
+	paste -d' ' <(cut -d' ' -f1-4,7-8 ${PROC_DIR}/tauQ_vs_t0_${TE}_w0_${WE}.dat) <(cut -d' ' -f3-11 ${PROC_DIR}/scaled_chi_${TE}_${WE}.dat) <(cut -d' ' -f4-11 ${PROC_DIR}/scaled_chi_${TE_DEMO}_${WE_DEMO}.dat) | tr ' ' ',' >> $@
+
+csvs : scales.csv cont_lim.csv topology.csv
 
 .PHONY : all csvs datapackage clean-all clean-pickls clean-processed clean-tables clean-plots clean all-tables all-figures short-tables short-figures long-tables long-figures
 

@@ -27,6 +27,7 @@ parser.add_argument("summary_data_filename")
 parser.add_argument("--t0_plot_filename", default=None)
 parser.add_argument("--w0_plot_filename", default=None)
 parser.add_argument("--beta_table_file", type=argparse.FileType("w"), default="-")
+parser.add_argument("--beta_table_data_file", type=argparse.FileType("w"), default=None)
 parser.add_argument("--cont_t0_table_file", type=argparse.FileType("w"), default="-")
 parser.add_argument("--cont_w0_table_file", type=argparse.FileType("w"), default="-")
 parser.add_argument("--clim_data_file", type=argparse.FileType("w"), default="-")
@@ -189,6 +190,21 @@ for i in np.unique(chi_SPN["N"]):
             "$ \\\\",
             file=args.beta_table_file,
         )
+        if args.beta_table_data_file:
+            print(
+                int(pl_data["N"][l]),
+                pl_data["beta"][l],
+                int(pl_data["nconf"][l]),
+                uval_sqrtS_t0.n,
+                uval_sqrtS_t0.s,
+                val_t0.n,
+                val_t0.s,
+                uval_sqrtS_w0.n,
+                uval_sqrtS_w0.s,
+                val_w0.n,
+                val_w0.s,
+                file=args.beta_table_data_file,
+            )
 print(table_end, file=args.beta_table_file)
 args.beta_table_file.close()
 
