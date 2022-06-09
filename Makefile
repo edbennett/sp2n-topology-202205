@@ -53,7 +53,7 @@ NON_SCALED_SUFFIXES_6 = 16_15.9 16_16.1
 FIG1_OUTPUT = ${PLOT_DIR}/non_scaled_flows_6.pdf
 
 ${PLOT_DIR}/non_scaled_flows_%.pdf : $$(foreach SUFFIX, $${NON_SCALED_SUFFIXES_$$*}, ${PROC_DIR}/WF_$$*_$${SUFFIX}) $$(foreach SUFFIX, $${NON_SCALED_SUFFIXES_$$*}, $$(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_$$*_$${SUFFIX}_$${FLOW})) | ${PLOT_DIR}
-	PLOT_DIR=${PLOT_DIR} python src/vis_WF_W_E.py ${TE_DEMO} ${WE_DEMO} $(foreach SUFFIX, ${NON_SCALED_SUFFIXES_$*}, ${PROC_DIR}/WF_$$*_${SUFFIX}) --absolute_scales --outfile $@
+	PLOT_DIR=${PLOT_DIR} python src/vis_WF_W_E.py ${TE_DEMO} ${WE_DEMO} $(foreach SUFFIX, ${NON_SCALED_SUFFIXES_$*}, ${PROC_DIR}/WF_$*_${SUFFIX}) --absolute_scales --outfile $@
 
 # Figure 2, 12-17; tables 2, 3, 7-10
 FIG2_OUTPUT = $(foreach OBS, w t, ${PLOT_DIR}/Scale_6_${OBS}0.pdf)
