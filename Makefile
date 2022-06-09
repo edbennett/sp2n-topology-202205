@@ -44,7 +44,8 @@ $(foreach SUFFIX, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_%_${SUFFIX}) &: ${
 
 # Table 1
 TAB1_OUTPUT = ${TABLES_DIR}/table_tauQ_t0_${TE}_w0_${WE}.tex
-TAB1_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX} $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${SUFFIX}_${FLOW}))
+TAB1_MAIN_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX})
+TAB1_PICKLE_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${SUFFIX}_${FLOW}))
 ${TABLES_DIR}/table_tauQ_t0_%.tex ${PROC_DIR}/tauQ_vs_t0_%.dat &: ${TAB1_DEPS} | ${TABLES_DIR}
 	bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TABLES_DIR}/table_tauQ_t0_$*.tex
 
@@ -146,8 +147,8 @@ SHORT_TABLE = ${SHORT_TABLES_DIR}/summary_table.tex
 ${SHORT_FIGS} ${SHORT_TABLE} universality.csv &: $(foreach AUTHORS,AA_MT DD_EV_HP CB_MD CB_CB_MD BL_MT,quoted_data/clim_SU_${AUTHORS}.dat) ${PROC_DIR}/clim_SP_${TE}_${WE}.dat | ${SHORT_PLOT_DIR} ${SHORT_TABLES_DIR}
 	PLOT_DIR=${SHORT_PLOT_DIR} TABLES_DIR=${SHORT_TABLES_DIR} PROC_DIR=${PROC_DIR} QUOTED_DIR=${QUOTED_DIR} python src/fits_largeN_universality.py
 
-datapackage.h5 : ${TAB1_DEPS} $(foreach PREFIX, ${TAB1_DEPS}, ${PREFIX}_plaq)
-	python src/package_data.py $^ --hdf5_filename=$@
+datapackage.h5 : ${TAB1_MAIN_DEPS} $(foreach PREFIX, ${TAB1_MAIN_DEPS}, ${PREFIX}_plaq)
+	python src/package_data.py ${TAB1_MAIN_DEPS} --hdf5_filename=$@
 
 long-figures : $(foreach FIGNUM, 1 2 3 4 5 6789 10 11 12 13 14 15 16 17,${FIG${FIGNUM}_OUTPUT}) ${SHORT_FIGS}
 long-tables : $(foreach TABNUM, 1 2 3 45 6 7 8 9 10 11 12, ${TAB${TABNUM}_OUTPUT})
