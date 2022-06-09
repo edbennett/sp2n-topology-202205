@@ -44,7 +44,7 @@ $(foreach SUFFIX, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_%_${SUFFIX}) &: ${
 
 # Table 1
 TAB1_OUTPUT = ${TABLES_DIR}/table_tauQ_t0_${TE}_w0_${WE}.tex
-TAB1_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX})
+TAB1_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX} $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${SUFFIX}_${FLOW}))
 ${TABLES_DIR}/table_tauQ_t0_%.tex ${PROC_DIR}/tauQ_vs_t0_%.dat &: ${TAB1_DEPS} | ${TABLES_DIR}
 	bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TABLES_DIR}/table_tauQ_t0_$*.tex
 
@@ -52,8 +52,8 @@ ${TABLES_DIR}/table_tauQ_t0_%.tex ${PROC_DIR}/tauQ_vs_t0_%.dat &: ${TAB1_DEPS} |
 NON_SCALED_SUFFIXES_6 = 16_15.9 16_16.1
 FIG1_OUTPUT = ${PLOT_DIR}/non_scaled_flows_6.pdf
 
-${PLOT_DIR}/non_scaled_flows_%.pdf : $$(foreach SUFFIX, $${NON_SCALED_SUFFIXES_$$*}, ${PROC_DIR}/WF_$$*_$${SUFFIX}) | $$(foreach SUFFIX, $${NON_SCALED_SUFFIXES_$$*}, $$(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_$$*_$${SUFFIX}_$${FLOW})) ${PLOT_DIR}
-	PLOT_DIR=${PLOT_DIR} python src/vis_WF_W_E.py ${TE_DEMO} ${WE_DEMO} $^ --absolute_scales --outfile $@
+${PLOT_DIR}/non_scaled_flows_%.pdf : $$(foreach SUFFIX, $${NON_SCALED_SUFFIXES_$$*}, ${PROC_DIR}/WF_$$*_$${SUFFIX}) $$(foreach SUFFIX, $${NON_SCALED_SUFFIXES_$$*}, $$(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_$$*_$${SUFFIX}_$${FLOW})) | ${PLOT_DIR}
+	PLOT_DIR=${PLOT_DIR} python src/vis_WF_W_E.py ${TE_DEMO} ${WE_DEMO} $(foreach SUFFIX, ${NON_SCALED_SUFFIXES_$*}, ${PROC_DIR}/WF_$$*_${SUFFIX}) --absolute_scales --outfile $@
 
 # Figure 2, 12-17; tables 2, 3, 7-10
 FIG2_OUTPUT = $(foreach OBS, w t, ${PLOT_DIR}/Scale_6_${OBS}0.pdf)
@@ -101,8 +101,8 @@ ${PLOT_DIR}/flows_%_scaled.pdf : ${FIG3_4_ARGS} ${FIG3_4_REQS} | ${PLOT_DIR}
 # Figure 5
 FIG5_OUTPUT = ${PLOT_DIR}/TCvst_8_16_26.7.pdf
 
-${PLOT_DIR}/TCvst_%.pdf : ${PROC_DIR}/WF_% | $$(foreach FLOW, t_E w_E t_symE w_symE, $${PICKLE_DIR}/pkl_bs_$$*_$${FLOW}) ${PLOT_DIR}
-	PLOT_DIR=${PLOT_DIR} python src/Topo_t.py ${TE} ${WE} $^
+${PLOT_DIR}/TCvst_%.pdf : ${PROC_DIR}/WF_% $$(foreach FLOW, t_E w_E t_symE w_symE, $${PICKLE_DIR}/pkl_bs_$$*_$${FLOW}) | ${PLOT_DIR}
+	PLOT_DIR=${PLOT_DIR} python src/Topo_t.py ${TE} ${WE} ${PROC_DIR}/WF_$*
 
 # Figure 6, 7, 8, 9
 FIG6789_NC2_SUFFIXES = 32_2.65 32_2.70
