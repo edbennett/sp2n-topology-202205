@@ -58,22 +58,26 @@ for fname in args.input_datafiles:
     w0_flow_symE = pkl.load(infile)
     infile.close()
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
+    # Seed RNGs compatibly with other calls
+    tw_rng = es.get_rng(f"{TE_scaled}_{fname}_sym")
+    q_rng = es.get_rng(f"{TE_scaled}_{fname}_q")
+
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_rng)
     TC = es.find_TC(rawdata, t0_tmp_symE[0])
     a_min = es.topo_find_alpha(TC)
     TCdata = np.zeros(len(TC), dtype=[("nconf", "i8"), ("TC", "f8")])
     TCdata["nconf"] = range(1, len(TC) + 1)
     TCdata["TC"] = np.rint(a_min * TC)
 
-    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled)
+    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_rng)
     TC_w = es.find_TC(rawdata, w0_tmp_symE[0] ** 2)
     a_min = es.topo_find_alpha(TC_w)
     TCdata_w = np.zeros(len(TC_w), dtype=[("nconf", "i8"), ("TC", "f8")])
     TCdata_w["nconf"] = range(1, len(TC_w) + 1)
     TCdata_w["TC"] = np.rint(a_min * TC_w)
 
-    s_TC_avg, s_TC_err = es.bs_avg_err_TC(TCdata["TC"], 20)
-    s_TC_w_avg, s_TC_w_err = es.bs_avg_err_TC(TCdata_w["TC"], 20)
+    s_TC_avg, s_TC_err = es.bs_avg_err_TC(TCdata["TC"], 20, rng=q_rng)
+    s_TC_w_avg, s_TC_w_err = es.bs_avg_err_TC(TCdata_w["TC"], 20, rng=q_rng)
 
     Nconfs = len(TCdata["nconf"])
 

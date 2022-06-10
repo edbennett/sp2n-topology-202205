@@ -1,5 +1,4 @@
 import sys
-import hashlib
 import numpy as np
 import matplotlib.pyplot as plt
 import re
@@ -15,11 +14,7 @@ import pickle as pkl
 for faddr in sys.argv[1:]:
     N, L, beta, rawdata = es.topo_load_raw_data(faddr)
 
-    # Seed RNG with file address to get reproducible output
-    faddr_hash = hashlib.md5(faddr.encode("utf8")).digest()
-    seed = abs(int.from_bytes(faddr_hash, 'big'))
-    rng = np.random.default_rng(seed)
-
+    rng = es.get_rng(faddr)
     fn_pkl = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
 
     bs_flow_E, w0_flow_E = es.flows(rawdata, 100, "t2E", rng=rng)

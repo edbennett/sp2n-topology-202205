@@ -64,9 +64,13 @@ for TE in e0_list:
         w0_flow_symE = pkl.load(infile)
         infile.close()
 
+        # Seed an RNG seeded by our current parameters so that
+        # the results reproduce.
+        tw_plaq_rng = es.get_rng(f"{TE}_{faddr}_plaq")
+
         try:
-            t0_tmp_E = es.find_t0(bs_flow_E, TE_scaled)
-            w0_tmp_E = es.find_w0(w0_flow_E, WE_scaled)
+            t0_tmp_E = es.find_t0(bs_flow_E, TE_scaled, rng=tw_plaq_rng)
+            w0_tmp_E = es.find_w0(w0_flow_E, WE_scaled, rng=tw_plaq_rng)
             t0_tmp_E_u = ufloat(t0_tmp_E[0], t0_tmp_E[1])
             w0_tmp_E_u = ufloat(w0_tmp_E[0], w0_tmp_E[1])
             tmp_fin_E = np.array(
@@ -91,9 +95,13 @@ for TE in e0_list:
             t0_tmp_E = np.nan
             w0_tmp_E = np.nan
 
+        # Seed a fresh RNG so that we get results compatible with
+        # vis_WF_N_scaling.py
+        tw_sym_rng = es.get_rng(f"{TE}_{faddr}_sym")
+
         try:
-            t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
-            w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled)
+            t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_sym_rng)
+            w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_sym_rng)
             t0_tmp_symE_u = ufloat(t0_tmp_symE[0], t0_tmp_symE[1])
             w0_tmp_symE_u = ufloat(w0_tmp_symE[0], w0_tmp_symE[1])
 

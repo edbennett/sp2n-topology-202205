@@ -1,10 +1,19 @@
+import hashlib
 import numpy as np
 import re
 from scipy.interpolate import interp1d
 
+rng = np.random.default_rng()
+
+def get_rng(seed_string):
+    '''Return a numpy `default_rng` object seeded by the
+    MD5 hash of the given `seed_string`'''
+    seed_hash = hashlib.md5(seed_string.encode("utf8")).digest()
+    seed = abs(int.from_bytes(seed_hash, 'big'))
+    return np.random.default_rng(seed)
+
 
 def autocorr(indata):
-
     L = len(indata)
     if L == 0:
         print("Empty data set")
@@ -76,7 +85,7 @@ def topo_load_raw_data(fname):
     return N, L, beta, out_data
 
 
-def bs_avg_err_TC(din, bin_size=20):
+def bs_avg_err_TC(din, bin_size=20, rng=rng):
     bin1 = []
     bin2 = []
     for i in range(int(len(din) / bin_size)):
@@ -86,7 +95,7 @@ def bs_avg_err_TC(din, bin_size=20):
     resampled1 = []
     resampled2 = []
     for j in range(100):
-        sam = np.random.randint(0, len(bin1), size=len(bin1))
+        sam = rng.integers(0, len(bin1), size=len(bin1))
         avg = np.average([bin1[i] for i in sam])
         avg2 = np.average([bin2[i] for i in sam])
         resampled1.append(avg)
@@ -94,12 +103,12 @@ def bs_avg_err_TC(din, bin_size=20):
     return np.average(resampled2), np.std(resampled2)
 
 
-def bstrap(a, nbstrap):
+def bstrap(a, nbstrap, rng=rng):
     stat1 = np.zeros(nbstrap)
     stat2 = np.zeros(nbstrap)
     lena = len(a)
     for i in range(nbstrap):
-        atmp = np.random.choice(a, lena, replace=True)
+        atmp = rng.choice(a, lena, replace=True)
         stat1[i] = np.average(atmp)
         stat2[i] = np.std(atmp, ddof=1)
     s1 = np.average(stat1)
@@ -109,7 +118,7 @@ def bstrap(a, nbstrap):
     return s1, e1, s2, e2
 
 
-def find_t0(indata, TE):
+def find_t0(indata, TE, rng=rng):
     t0 = []
     for i in np.unique(indata["bs"]):
         data = np.compress(indata["bs"] == i, indata)
@@ -117,11 +126,11 @@ def find_t0(indata, TE):
         traj = data[idx - 5 : idx + 5]
         f = interp1d(traj["flow"], traj["t"])
         t0 = np.append(t0, f(TE))
-    a, b, c, d = bstrap(t0, 100)
+    a, b, c, d = bstrap(t0, 100, rng=rng)
     return a, c
 
 
-def find_w0(indata, TE):
+def find_w0(indata, TE, rng=rng):
     t0 = []
     for i in np.unique(indata["bs"]):
         data = np.compress(indata["bs"] == i, indata)
@@ -129,11 +138,9 @@ def find_w0(indata, TE):
         traj = data[idx - 5 : idx + 5]
         f = interp1d(traj["flow"], traj["t"])
         t0 = np.append(t0, np.sqrt(f(TE)))
-    a, b, c, d = bstrap(t0, 100)
+    a, b, c, d = bstrap(t0, 100, rng=rng)
     return a, c
 
-
-rng = np.random.default_rng()
 
 
 def flows(rawdata, N_bs, obs, Ntherm=500, rng=rng):

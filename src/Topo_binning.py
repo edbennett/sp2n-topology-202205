@@ -23,14 +23,14 @@ plt.rcParams["lines.markersize"] = 2
 plt.matplotlib.rc("font", size=11)
 
 
-def binned_std(din, bin_size):
+def binned_std(din, bin_size, rng=np.random.default_rng()):
     bin1 = []
     for i in range(int(len(din) / bin_size)):
         bin1.append(np.average(din[i * bin_size : (i + 1) * bin_size]))
 
     resampled1 = []
     for j in range(200):
-        sam = np.random.randint(0, len(bin1), size=len(bin1))
+        sam = rng.integers(0, len(bin1), size=len(bin1))
         avg1 = np.average([bin1[i] for i in sam])
         resampled1.append(avg1)
 
@@ -68,7 +68,10 @@ for fname in sys.argv[3:]:
     bs_flow_symE = pkl.load(infile)
     infile.close()
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
+    # Seed RNG compatibly with other calls
+    rng = es.get_rng(f"{TE_scaled}_{fname}_sym")
+
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=rng)
 
     TC = es.find_TC(TCdata, t0_tmp_symE[0])
     autC, autC_err = es.autocorr(TC)
@@ -83,6 +86,7 @@ for fname in sys.argv[3:]:
     plt.ylabel(r"$\frac{\sigma_b}{\sigma}$")
     name_postfix = "_"
 
+    rng = es.get_rng(f"{fname}_{TE}_bin")
     std_1 = binned_std(TC, 1)
     binned_res = [(binned_std(TC, i) / std_1) ** 2 for i in bin_range]
     lab = r"$\beta=" + str(beta) + "$"

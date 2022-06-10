@@ -32,7 +32,10 @@ for faddr in sys.argv[3:]:
 
     plaq_fname = faddr + "_plaq"
     plaq_data = np.genfromtxt(plaq_fname)
-    plaq_bs = es.bstrap(plaq_data, len(plaq_data))
+
+    # Seed an RNG so that the bootstrap is reproducible
+    plaq_rng = es.get_rng(faddr)
+    plaq_bs = es.bstrap(plaq_data, len(plaq_data), rng=plaq_rng)
     plaq_u = ufloat(plaq_bs[0], plaq_bs[1])
     print(N, L, beta, "{:.2uS}".format(plaq_u))
     lthooft = es.d_g_SPN(int(N)) * plaq_u / float(beta)
@@ -47,8 +50,10 @@ for faddr in sys.argv[3:]:
     w0_flow_symE = pkl.load(infile)
     infile.close()
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
-    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled)
+    # Seed this RNG compatibly with `vis_WF_Scale.py`
+    tw_rng = es.get_rng(f"{TE_scaled}_{faddr}_sym")
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_rng)
+    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_rng)
 
     ax[0].set_xlabel(r"$t/t_0$")
     ax[0].set_ylabel(r"$\mathcal{E}(t)/C_2(F)$")

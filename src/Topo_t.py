@@ -43,14 +43,17 @@ for fname in sys.argv[3:]:
     w0_flow_symE = pkl.load(infile)
     infile.close()
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
+    # Seed RNG compatibly with other calls
+    rng = es.get_rng(f"{TE_scaled}_{fname}_sym")
+
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=rng)
     TC = es.find_TC(TCdata, t0_tmp_symE[0])
     a_min = es.topo_find_alpha(TC)
     TCdata_t = np.zeros(len(TC), dtype=[("nconf", "i8"), ("TC", "f8")])
     TCdata_t["nconf"] = range(1, len(TC) + 1)
     TCdata_t["TC"] = np.rint(a_min * TC)
 
-    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled)
+    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=rng)
     TC_w = es.find_TC(TCdata, w0_tmp_symE[0] ** 2)
     a_min = es.topo_find_alpha(TC_w)
     TCdata_w = np.zeros(len(TC_w), dtype=[("nconf", "i8"), ("TC", "f8")])
