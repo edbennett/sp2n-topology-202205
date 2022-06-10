@@ -131,7 +131,7 @@ FIG11_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 
 TAB45_OUTPUT = ${TABLES_DIR}/table_chi_${TE}_${WE}.tex
 CHI_VS_T0_DEPS = $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX}))
-${PROC_DIR}/chi_vs_t0_%_scaled.dat &: ${CHI_VS_T0_DEPS} ${QUOTED_DIR}/sqrts_vs_beta.dat $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW})) | ${TABLES_DIR}
+${PROC_DIR}/chi_vs_t0_%_scaled.dat &: ${CHI_VS_T0_DEPS} ${QUOTED_DIR}/sqrts_vs_beta.dat $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW}))) | ${TABLES_DIR}
 	python src/Topology.py $(subst _w0_, ,$*) ${CHI_VS_T0_DEPS} --sqrt_sigma_filename ${QUOTED_DIR}/sqrts_vs_beta.dat --output_data ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
