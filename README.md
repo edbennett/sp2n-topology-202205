@@ -25,6 +25,7 @@ The various components are joined together using Make. The code has been tested 
 
 * Python 3.10 (with requirements as documented in `environment.yml`)
 * GNU Make 4.3
+* LaTeX (to allow Matplotlib to put formatted equations into plots)
 * (Optionally) Conda to manage dependencies
 
 In particular, versions of Make before 4.3 will not work. This includes the
