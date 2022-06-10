@@ -1,4 +1,5 @@
 import sys
+import hashlib
 import numpy as np
 import matplotlib.pyplot as plt
 import re
@@ -15,7 +16,9 @@ for faddr in sys.argv[1:]:
     N, L, beta, rawdata = es.topo_load_raw_data(faddr)
 
     # Seed RNG with file address to get reproducible output
-    rng = np.random.default_rng(abs(hash(faddr)))
+    faddr_hash = hashlib.md5(faddr.encode("utf8")).digest()
+    seed = abs(int.from_bytes(faddr_hash, 'big'))
+    rng = np.random.default_rng(seed)
 
     fn_pkl = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
 
