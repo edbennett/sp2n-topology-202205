@@ -11,6 +11,8 @@ parser.add_argument("input_datafiles", nargs="+")
 parser.add_argument("--output_data", type=argparse.FileType("w"), default="-")
 parser.add_argument("--output_tex", type=argparse.FileType("w"), default="-")
 parser.add_argument("--sqrt_sigma_filename", default="./sqrts_vs_beta.dat")
+parser.add_argument("--num_bs", type=int, default=es.DEFAULT_NUM_BS)
+parser.add_argument("--pickle_dir", default="pkl_flows_bs")
 args = parser.parse_args()
 
 sqrts_data = np.genfromtxt(
@@ -44,7 +46,7 @@ for fname in args.input_datafiles:
     TE_scaled = args.TE * es.Casimir_SP(iN)
     WE_scaled = args.WE * es.Casimir_SP(iN)
 
-    fn_bs = "pkl_flows_bs/pkl_bs_" + iN + "_" + iL + "_" + iB + "_"
+    fn_bs = args.pickle_dir + "/pkl_bs_" + iN + "_" + iL + "_" + iB + "_"
     infile = open(fn_bs + "t_E", "rb")
     bs_flow_E = pkl.load(infile)
     infile.close()
@@ -62,14 +64,14 @@ for fname in args.input_datafiles:
     tw_rng = es.get_rng(f"{TE_scaled}_{fname}_sym")
     q_rng = es.get_rng(f"{TE_scaled}_{fname}_q")
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_rng)
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_rng, num_bs=args.num_bs)
     TC = es.find_TC(rawdata, t0_tmp_symE[0])
     a_min = es.topo_find_alpha(TC)
     TCdata = np.zeros(len(TC), dtype=[("nconf", "i8"), ("TC", "f8")])
     TCdata["nconf"] = range(1, len(TC) + 1)
     TCdata["TC"] = np.rint(a_min * TC)
 
-    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_rng)
+    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_rng, num_bs=args.num_bs)
     TC_w = es.find_TC(rawdata, w0_tmp_symE[0] ** 2)
     a_min = es.topo_find_alpha(TC_w)
     TCdata_w = np.zeros(len(TC_w), dtype=[("nconf", "i8"), ("TC", "f8")])

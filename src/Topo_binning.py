@@ -1,6 +1,5 @@
 import csv
-import os
-import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import re
@@ -23,13 +22,13 @@ plt.rcParams["lines.markersize"] = 2
 plt.matplotlib.rc("font", size=11)
 
 
-def binned_std(din, bin_size, rng=np.random.default_rng()):
+def binned_std(din, bin_size, rng=np.random.default_rng(), num_bs=es.DEFAULT_NUM_BS):
     bin1 = []
     for i in range(int(len(din) / bin_size)):
         bin1.append(np.average(din[i * bin_size : (i + 1) * bin_size]))
 
     resampled1 = []
-    for j in range(200):
+    for j in range(num_bs):
         sam = rng.integers(0, len(bin1), size=len(bin1))
         avg1 = np.average([bin1[i] for i in sam])
         resampled1.append(avg1)
@@ -39,12 +38,19 @@ def binned_std(din, bin_size, rng=np.random.default_rng()):
     return a
 
 
-DATA_DIR = os.environ.get("DATA_DIR", ".")
-PROC_DIR = os.environ.get("PROC_DIR", ".")
+parser = argparse.ArgumentParser()
+parser.add_argument("--data_dir", default=".")
+parser.add_argument("--proc_dir", default=".")
+parser.add_argument("--pickle_dir", default="pkl_flows_bs")
+parser.add_argument("TE", type=float)
+parser.add_argument("WE", type=float)
+parser.add_argument("fnames", nargs="+")
+parser.add_argument("--num_bs", type=int, default=es.DEFAULT_NUM_BS)
+args = parser.parse_args()
 
 
 def get_n_sw(N, L, beta):
-    with open(DATA_DIR + "/DATA_FILES", "r") as f:
+    with open(args.data_dir + "/DATA_FILES", "r") as f:
         reader = csv.reader(f)
         for row in reader:
             if row[0] == N and row[1] == L and row[2] == beta:
@@ -54,16 +60,14 @@ def get_n_sw(N, L, beta):
 
 bin_range = np.arange(1, 100, 1)
 
-TE = float(sys.argv[1])
-WE = float(sys.argv[2])
-outf = PROC_DIR + "/tauQ_vs_t0_" + str(TE) + "_w0_" + str(WE) + ".dat"
+outf = args.proc_dir + "/tauQ_vs_t0_" + str(args.TE) + "_w0_" + str(args.WE) + ".dat"
 f = open(outf, "a")
-for fname in sys.argv[3:]:
+for fname in args.fnames:
     N, L, beta, TCdata = es.topo_load_raw_data(fname)
-    TE_scaled = TE
-    WE_scaled = WE
+    TE_scaled = args.TE
+    WE_scaled = args.WE
 
-    fn_bs = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
+    fn_bs = args.pickle_dir + "/pkl_bs_" + N + "_" + L + "_" + beta + "_"
     infile = open(fn_bs + "t_symE", "rb")
     bs_flow_symE = pkl.load(infile)
     infile.close()
@@ -71,7 +75,7 @@ for fname in sys.argv[3:]:
     # Seed RNG compatibly with other calls
     rng = es.get_rng(f"{TE_scaled}_{fname}_sym")
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=rng)
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=rng, num_bs=args.num_bs)
 
     TC = es.find_TC(TCdata, t0_tmp_symE[0])
     autC, autC_err = es.autocorr(TC)
@@ -87,12 +91,12 @@ for fname in sys.argv[3:]:
     name_postfix = "_"
 
     rng = es.get_rng(f"{fname}_{TE}_bin")
-    std_1 = binned_std(TC, 1)
-    binned_res = [(binned_std(TC, i) / std_1) ** 2 for i in bin_range]
+    std_1 = binned_std(TC, 1, num_bs=args.num_bs)
+    binned_res = [(binned_std(TC, i, num_bs=args.num_bs) / std_1) ** 2 for i in bin_range]
     lab = r"$\beta=" + str(beta) + "$"
     plt.plot(bin_range, binned_res, label=lab)
     name_postfix = name_postfix + beta
     plt.legend(frameon=False)
     fname_out = "binning_aut_" + str(N) + name_postfix + ".pdf"
-    plt.savefig(PROC_DIR + "/" + fname_out)
+    plt.savefig(args.proc_dir + "/" + fname_out)
     plt.close(plt.gcf())

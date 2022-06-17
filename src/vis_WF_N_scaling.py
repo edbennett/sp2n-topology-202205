@@ -1,5 +1,4 @@
-import os
-import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,18 +16,21 @@ plt.rcParams["errorbar.capsize"] = 2
 plt.rcParams["lines.markersize"] = 2
 plt.matplotlib.rc("font", size=11)
 
-outdir = os.environ.get("PLOT_DIR", ".")
-
-TE = float(sys.argv[1])
-WE = float(sys.argv[2])
-
+parser = argparse.ArgumentParser()
+parser.add_argument("TE", type=int)
+parser.add_argument("WE", type=int)
+parser.add_argument("faddrs", nargs="+")
+parser.add_argument("--plot_dir", default=".")
+parser.add_argument("--pickle_dir", default="pkl_flows_bs")
+parser.add_argument("--num_bs", type=int, default=es.DEFAULT_NUM_BS)
+args = parser.parse_args()
 
 fig, ax = plt.subplots(2, 1)
-for faddr in sys.argv[3:]:
+for faddr in args.faddrs:
 
     N, L, beta, rawdata = es.topo_load_raw_data(faddr)
-    TE_scaled = TE * es.Casimir_SP(N)
-    WE_scaled = WE * es.Casimir_SP(N)
+    TE_scaled = args.TE * es.Casimir_SP(N)
+    WE_scaled = args.WE * es.Casimir_SP(N)
 
     plaq_fname = faddr + "_plaq"
     plaq_data = np.genfromtxt(plaq_fname)
@@ -42,7 +44,7 @@ for faddr in sys.argv[3:]:
     print(N, L, beta, "{:.2uS}".format(lthooft))
 
     print("loading flow files")
-    fn_bs = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
+    fn_bs = args.pickle_dir + "/pkl_bs_" + N + "_" + L + "_" + beta + "_"
     infile = open(fn_bs + "t_symE", "rb")
     bs_flow_symE = pkl.load(infile)
     infile.close()
@@ -52,8 +54,8 @@ for faddr in sys.argv[3:]:
 
     # Seed this RNG compatibly with `vis_WF_Scale.py`
     tw_rng = es.get_rng(f"{TE_scaled}_{faddr}_sym")
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_rng)
-    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_rng)
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_rng, num_bs=args.num_bs)
+    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_rng, num_bs=args.num_bs)
 
     ax[0].set_xlabel(r"$t/t_0$")
     ax[0].set_ylabel(r"$\mathcal{E}(t)/C_2(F)$")
@@ -91,4 +93,4 @@ for faddr in sys.argv[3:]:
     )
     ax[1].legend(loc=2, prop={"size": 7}, frameon=False)
 plt.tight_layout()
-plt.savefig(outdir + "/flows_" + str(TE) + "_" + str(WE) + "_scaled.pdf")
+plt.savefig(args.plot_dir + "/flows_" + str(TE) + "_" + str(WE) + "_scaled.pdf")

@@ -21,6 +21,7 @@ parser.add_argument("WE", type=float)
 parser.add_argument("infiles", nargs="+")
 parser.add_argument("--outfile", required=True)
 parser.add_argument("--absolute_scales", action="store_true")
+parser.add_argument("--pickle_dir", default="pkl_flows_bs")
 args = parser.parse_args()
 
 outdir = os.environ.get("PLOT_DIR", ".")
@@ -36,7 +37,7 @@ for faddr in args.infiles:
         WE_scaled = args.WE * es.Casimir_SP(N)
 
     print("loading flow files")
-    fn_bs = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
+    fn_bs = args.pickle_dir + "/pkl_bs_" + N + "_" + L + "_" + beta + "_"
     infile = open(fn_bs + "t_E", "rb")
     bs_flow_E = pkl.load(infile)
     infile.close()

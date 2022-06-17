@@ -6,6 +6,9 @@ WE = 0.225
 TE_DEMO = 0.5
 WE_DEMO = 0.5
 
+# Number of bootstrap samples to use in bootstrap computations
+NUM_BS = 1000
+
 # Set this to where the raw output files are
 DATA_DIR = data
 
@@ -40,14 +43,14 @@ ${PROC_DIR}/WF_%_plaq : ${DATA_DIR}/out_% | ${PROC_DIR}
 
 # Bootstrap samples
 $(foreach SUFFIX, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_%_${SUFFIX}) &: ${PROC_DIR}/WF_% | ${PICKLE_DIR}
-	python src/produce_bs_sample.py $^
+	python src/produce_bs_sample.py $^ --num_bs ${NUM_BS} --pickle_dir ${PICKLE_DIR}
 
 # Table 1
 TAB1_OUTPUT = ${TABLES_DIR}/table_tauQ_t0_${TE}_w0_${WE}.tex
 TAB1_MAIN_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, ${PROC_DIR}/WF_${SUFFIX})
 TAB1_PICKLE_DEPS = $(foreach SUFFIX, 2_20_2.55 2_24_2.60 2_32_2.65 2_32_2.70 4_20_7.7 4_20_7.72 4_20_7.76 4_20_7.78 4_20_7.80 4_20_7.85 4_24_8.2 6_18_15.75 6_16_15.9 6_16_16.1 6_20_16.3 8_16_26.5 8_16_26.7 8_16_27.0 8_16_27.2, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${SUFFIX}_${FLOW}))
 ${TABLES_DIR}/table_tauQ_t0_%.tex ${PROC_DIR}/tauQ_vs_t0_%.dat &: ${TAB1_MAIN_DEPS} ${TAB1_PICKLE_DEPS} | ${TABLES_DIR}
-	bash src/table1.sh ${DATA_DIR} ${PROC_DIR} $(subst _w0_, ,$*) ${TABLES_DIR}/table_tauQ_t0_$*.tex
+	bash src/table1.sh ${DATA_DIR} ${PROC_DIR} ${PICKLE_DIR} $(subst _w0_, ,$*) ${TABLES_DIR}/table_tauQ_t0_$*.tex ${NUM_BS}
 
 # Figure 1
 NON_SCALED_SUFFIXES_6 = 16_15.9 16_16.1
@@ -84,7 +87,7 @@ FIG2_RAW_DEPS = $(foreach SUFFIX,${FIG2_NC$1_SUFFIXES},${PROC_DIR}/WF_$1_${SUFFI
 FIG2_PICKLE_DEPS = $(foreach SUFFIX,${FIG2_NC$1_SUFFIXES},$(foreach VAR,t_E w_E t_symE w_symE,${PICKLE_DIR}/pkl_bs_$1_${SUFFIX}_${VAR}))
 
 ${PROC_DIR}/Scale_%.dat ${PLOT_DIR}/Scale_%_t0.pdf ${PLOT_DIR}/Scale_%_w0.pdf ${PROC_DIR}/Scale_%.csv &: $$(call FIG2_RAW_DEPS,$$*) $$(call FIG2_PICKLE_DEPS,$$*) | ${PROC_DIR} ${PLOT_DIR}
-	python src/vis_WF_Scale.py $(call FIG2_RAW_DEPS,$*) --t0_plot_filename ${PLOT_DIR}/Scale_$*_t0.pdf --w0_plot_filename ${PLOT_DIR}/Scale_$*_w0.pdf --csv_file ${PROC_DIR}/Scale_$*.csv > ${PROC_DIR}/Scale_$*.dat
+	python src/vis_WF_Scale.py $(call FIG2_RAW_DEPS,$*) --t0_plot_filename ${PLOT_DIR}/Scale_$*_t0.pdf --w0_plot_filename ${PLOT_DIR}/Scale_$*_w0.pdf --csv_file ${PROC_DIR}/Scale_$*.csv --pickle_dir ${PICKLE_DIR} --num_bs ${NUM_BS} > ${PROC_DIR}/Scale_$*.dat
 
 ${TABLES_DIR}/Scale_%_t0.tex ${TABLES_DIR}/Scale_%_w0.tex &: ${PROC_DIR}/Scale_%.dat | ${TABLES_DIR}
 	bash src/tabulate_scale.sh $< ${TABLES_DIR}/Scale_$*_t0.tex ${TABLES_DIR}/Scale_$*_w0.tex
@@ -97,13 +100,13 @@ FIG3_4_ARGS = $(foreach SUFFIX,${FIG3_4_SUFFIXES},${PROC_DIR}/WF_${SUFFIX})
 FIG3_4_REQS = $(foreach SUFFIX,${FIG3_4_SUFFIXES},${PROC_DIR}/WF_${SUFFIX}_plaq ${PICKLE_DIR}/pkl_bs_${SUFFIX}_t_symE ${PICKLE_DIR}/pkl_bs_${SUFFIX}_w_symE)
 
 ${PLOT_DIR}/flows_%_scaled.pdf : ${FIG3_4_ARGS} ${FIG3_4_REQS} | ${PLOT_DIR}
-	PLOT_DIR=${PLOT_DIR} python src/vis_WF_N_scaling.py $$(echo $* | sed "s/_/ /") ${FIG3_4_ARGS}
+	python src/vis_WF_N_scaling.py $$(echo $* | sed "s/_/ /") ${FIG3_4_ARGS} --plot_dir ${PLOT_DIR} --num_bs ${NUM_BS}
 
 # Figure 5
 FIG5_OUTPUT = ${PLOT_DIR}/TCvst_8_16_26.7.pdf
 
 ${PLOT_DIR}/TCvst_%.pdf : ${PROC_DIR}/WF_% $$(foreach FLOW, t_E w_E t_symE w_symE, $${PICKLE_DIR}/pkl_bs_$$*_$${FLOW}) | ${PLOT_DIR}
-	PLOT_DIR=${PLOT_DIR} python src/Topo_t.py ${TE} ${WE} ${PROC_DIR}/WF_$*
+	PLOT_DIR=${PLOT_DIR} python src/Topo_t.py ${TE} ${WE} ${PROC_DIR}/WF_$* --plot_dir ${PLOT_DIR} --num_bs ${NUM_BS}
 
 # Figure 6, 7, 8, 9
 FIG6789_NC2_SUFFIXES = 32_2.65 32_2.70
@@ -132,7 +135,7 @@ FIG11_NC8_SUFFIXES = $(foreach BETA, 26.5 26.7 27.0 27.2, 16_${BETA})
 TAB45_OUTPUT = ${TABLES_DIR}/table_chi_${TE}_${WE}.tex
 CHI_VS_T0_DEPS = $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES},${PROC_DIR}/WF_${NC}_${SUFFIX}))
 ${PROC_DIR}/chi_vs_t0_%_scaled.dat &: ${CHI_VS_T0_DEPS} ${QUOTED_DIR}/sqrts_vs_beta.dat $(foreach NC, 2 4 6 8, $(foreach SUFFIX,${FIG11_NC${NC}_SUFFIXES}, $(foreach FLOW, t_E w_E t_symE w_symE, ${PICKLE_DIR}/pkl_bs_${NC}_${SUFFIX}_${FLOW}))) | ${TABLES_DIR}
-	python src/Topology.py $(subst _w0_, ,$*) ${CHI_VS_T0_DEPS} --sqrt_sigma_filename ${QUOTED_DIR}/sqrts_vs_beta.dat --output_data ${PROC_DIR}/chi_vs_t0_$*_scaled.dat
+	python src/Topology.py $(subst _w0_, ,$*) ${CHI_VS_T0_DEPS} --sqrt_sigma_filename ${QUOTED_DIR}/sqrts_vs_beta.dat --output_data ${PROC_DIR}/chi_vs_t0_$*_scaled.dat --num_bs ${NUM_BS} --pickle_dir ${PICKLE_DIR}
 
 FIG11_OUTPUT = $(foreach SUFFIX,.pdf _w0.pdf,$(foreach SCALE,${TE_DEMO} ${TE},${PLOT_DIR}/SPN_Topology_contlim_${SCALE}_${SCALE}_scaled${SUFFIX}))
 ${PLOT_DIR}/SPN_Topology_contlim_%_scaled.pdf ${PLOT_DIR}/SPN_Topology_contlim_%_scaled_w0.pdf ${TABLES_DIR}/table_chi_%.tex ${PROC_DIR}/scaled_chi_%.dat ${PROC_DIR}/clim_SP_%.dat $(foreach FLOW, t0 w0, ${PROC_DIR}/clim_table_${FLOW}_%.tex) ${PROC_DIR}/clim_SP_%.csv: ${PROC_DIR}/chi_vs_t0_$$(subst _,_w0_,$$*)_scaled.dat | ${PLOT_DIR} ${TABLES_DIR}

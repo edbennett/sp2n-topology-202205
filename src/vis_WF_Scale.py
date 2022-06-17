@@ -20,6 +20,8 @@ parser.add_argument("files_to_process", nargs="+")
 parser.add_argument("--t0_plot_filename", default="t0_scale.pdf")
 parser.add_argument("--w0_plot_filename", default="w0_scale.pdf")
 parser.add_argument("--csv_file", type=FileType("w"), default=None)
+parser.add_argument("--pickle_dir", default="pkl_flows_bs")
+parser.add_argument("--num_bs", type=int, default=es.DEFAULT_NUM_BS)
 args = parser.parse_args()
 
 if args.csv_file:
@@ -50,7 +52,7 @@ for TE in e0_list:
         TE_scaled = TE
         WE_scaled = TE
 
-        fn_bs = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
+        fn_bs = args.pickle_dir + "/pkl_bs_" + N + "_" + L + "_" + beta + "_"
         infile = open(fn_bs + "t_E", "rb")
         bs_flow_E = pkl.load(infile)
         infile.close()
@@ -69,8 +71,12 @@ for TE in e0_list:
         tw_plaq_rng = es.get_rng(f"{TE}_{faddr}_plaq")
 
         try:
-            t0_tmp_E = es.find_t0(bs_flow_E, TE_scaled, rng=tw_plaq_rng)
-            w0_tmp_E = es.find_w0(w0_flow_E, WE_scaled, rng=tw_plaq_rng)
+            t0_tmp_E = es.find_t0(
+                bs_flow_E, TE_scaled, rng=tw_plaq_rng, num_bs=args.num_bs
+            )
+            w0_tmp_E = es.find_w0(
+                w0_flow_E, WE_scaled, rng=tw_plaq_rng, num_bs=args.num_bs
+            )
             t0_tmp_E_u = ufloat(t0_tmp_E[0], t0_tmp_E[1])
             w0_tmp_E_u = ufloat(w0_tmp_E[0], w0_tmp_E[1])
             tmp_fin_E = np.array(
@@ -100,8 +106,12 @@ for TE in e0_list:
         tw_sym_rng = es.get_rng(f"{TE}_{faddr}_sym")
 
         try:
-            t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=tw_sym_rng)
-            w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=tw_sym_rng)
+            t0_tmp_symE = es.find_t0(
+                bs_flow_symE, TE_scaled, rng=tw_sym_rng, num_bs=args.num_bs
+            )
+            w0_tmp_symE = es.find_w0(
+                w0_flow_symE, WE_scaled, rng=tw_sym_rng, num_bs=args.num_bs
+            )
             t0_tmp_symE_u = ufloat(t0_tmp_symE[0], t0_tmp_symE[1])
             w0_tmp_symE_u = ufloat(w0_tmp_symE[0], w0_tmp_symE[1])
 

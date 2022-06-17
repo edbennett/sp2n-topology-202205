@@ -1,5 +1,4 @@
-import os
-import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,19 +16,23 @@ plt.rcParams["errorbar.capsize"] = 2
 plt.rcParams["lines.markersize"] = 2
 plt.matplotlib.rc("font", size=11)
 
-outdir = os.environ.get("PLOT_DIR", ".")
+parser = argparse.ArgumentParser()
+parser.add_argument("TE", type=float)
+parser.add_argument("WE", type=float)
+parser.add_argument("fnames", nargs="+")
+parser.add_argument("--plot_dir", default=".")
+parser.add_argument("--pickle_dir", default="pkl_flows_bs")
+parser.add_argument("--num_bs", type=int, default=es.DEFAULT_NUM_BS)
+args = parser.parse_args()
 
-TE = float(sys.argv[1])
-WE = float(sys.argv[2])
-
-for fname in sys.argv[3:]:
+for fname in args.fnames:
     N, L, beta, TCdata = es.topo_load_raw_data(fname)
 
     Nconf = int(np.max(TCdata["nconf"]))
-    TE_scaled = TE * es.Casimir_SP(N)
-    WE_scaled = WE * es.Casimir_SP(N)
+    TE_scaled = args.TE * es.Casimir_SP(N)
+    WE_scaled = args.WE * es.Casimir_SP(N)
 
-    fn_bs = "pkl_flows_bs/pkl_bs_" + N + "_" + L + "_" + beta + "_"
+    fn_bs = args.pickle_dir + "/pkl_bs_" + N + "_" + L + "_" + beta + "_"
     infile = open(fn_bs + "t_E", "rb")
     bs_flow_E = pkl.load(infile)
     infile.close()
@@ -46,14 +49,14 @@ for fname in sys.argv[3:]:
     # Seed RNG compatibly with other calls
     rng = es.get_rng(f"{TE_scaled}_{fname}_sym")
 
-    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=rng)
+    t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled, rng=rng, num_bs=args.num_bs)
     TC = es.find_TC(TCdata, t0_tmp_symE[0])
     a_min = es.topo_find_alpha(TC)
     TCdata_t = np.zeros(len(TC), dtype=[("nconf", "i8"), ("TC", "f8")])
     TCdata_t["nconf"] = range(1, len(TC) + 1)
     TCdata_t["TC"] = np.rint(a_min * TC)
 
-    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=rng)
+    w0_tmp_symE = es.find_w0(w0_flow_symE, WE_scaled, rng=rng, num_bs=args.num_bs)
     TC_w = es.find_TC(TCdata, w0_tmp_symE[0] ** 2)
     a_min = es.topo_find_alpha(TC_w)
     TCdata_w = np.zeros(len(TC_w), dtype=[("nconf", "i8"), ("TC", "f8")])
@@ -87,6 +90,8 @@ for fname in sys.argv[3:]:
         )
     plt.tight_layout()
     plt.legend(loc=2, frameon=False)
-    fname_out = outdir + "/TCvst_" + str(N) + "_" + str(L) + "_" + str(beta) + ".pdf"
+    fname_out = (
+        args.plot_dir + "/TCvst_" + str(N) + "_" + str(L) + "_" + str(beta) + ".pdf"
+    )
     plt.savefig(fname_out)
     plt.close(plt.gcf())

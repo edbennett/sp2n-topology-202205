@@ -4,6 +4,7 @@ import re
 from scipy.interpolate import interp1d
 
 rng = np.random.default_rng()
+DEFAULT_NUM_BS = 100
 
 
 def get_rng(seed_string):
@@ -90,7 +91,7 @@ def topo_load_raw_data(fname):
     return N, L, beta, out_data
 
 
-def bs_avg_err_TC(din, bin_size=20, rng=rng):
+def bs_avg_err_TC(din, bin_size=20, rng=rng, num_bs=DEFAULT_NUM_BS):
     bin1 = []
     bin2 = []
     for i in range(int(len(din) / bin_size)):
@@ -99,7 +100,7 @@ def bs_avg_err_TC(din, bin_size=20, rng=rng):
 
     resampled1 = []
     resampled2 = []
-    for j in range(100):
+    for j in range(num_bs):
         sam = rng.integers(0, len(bin1), size=len(bin1))
         avg = np.average([bin1[i] for i in sam])
         avg2 = np.average([bin2[i] for i in sam])
@@ -123,7 +124,7 @@ def bstrap(a, nbstrap, rng=rng):
     return s1, e1, s2, e2
 
 
-def find_t0(indata, TE, rng=rng):
+def find_t0(indata, TE, rng=rng, num_bs=DEFAULT_NUM_BS):
     t0 = []
     for i in np.unique(indata["bs"]):
         data = np.compress(indata["bs"] == i, indata)
@@ -131,11 +132,11 @@ def find_t0(indata, TE, rng=rng):
         traj = data[idx - 5 : idx + 5]
         f = interp1d(traj["flow"], traj["t"])
         t0 = np.append(t0, f(TE))
-    a, b, c, d = bstrap(t0, 100, rng=rng)
+    a, b, c, d = bstrap(t0, num_bs, rng=rng)
     return a, c
 
 
-def find_w0(indata, TE, rng=rng):
+def find_w0(indata, TE, rng=rng, num_bs=DEFAULT_NUM_BS):
     t0 = []
     for i in np.unique(indata["bs"]):
         data = np.compress(indata["bs"] == i, indata)
@@ -143,7 +144,7 @@ def find_w0(indata, TE, rng=rng):
         traj = data[idx - 5 : idx + 5]
         f = interp1d(traj["flow"], traj["t"])
         t0 = np.append(t0, np.sqrt(f(TE)))
-    a, b, c, d = bstrap(t0, 100, rng=rng)
+    a, b, c, d = bstrap(t0, num_bs, rng=rng)
     return a, c
 
 
