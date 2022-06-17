@@ -50,11 +50,15 @@ def f2(x, a, b):
 
 
 def g(x, a, b, c):
-    return a + b * x + c * x ** 2
+    return a + b * x + c * x**2
 
 
 patt = re.compile(r"chi_vs_t0_([0-9]+.[0-9]+)_w0_([0-9]+.[0-9]+)_([a-z]+).dat")
-t0, w0, labf, = patt.search(args.summary_data_filename).groups()
+(
+    t0,
+    w0,
+    labf,
+) = patt.search(args.summary_data_filename).groups()
 
 chi_SPN = np.genfromtxt(
     args.summary_data_filename,
@@ -140,7 +144,7 @@ for i in np.unique(chi_SPN["N"]):
 
     print(r"\hline", file=args.beta_table_file)
     for l in range(len(xdata_t0)):
-        val_t0 = 10 ** t_exponent * ufloat(ydata_t0[l], ydata_t0_err[l])
+        val_t0 = 10**t_exponent * ufloat(ydata_t0[l], ydata_t0_err[l])
         uval_sqrtS_t0 = ufloat(
             pl_data["sqrtS"][l] ** 2.0 * pl_data["tscale"][l],
             np.sqrt(
@@ -154,7 +158,7 @@ for i in np.unique(chi_SPN["N"]):
                 + (pl_data["sqrtS"][l] ** 2 * pl_data["tscale_err"][l]) ** 2
             ),
         )
-        val_w0 = 10 ** w_exponent * ufloat(ydata_w0[l], ydata_w0_err[l])
+        val_w0 = 10**w_exponent * ufloat(ydata_w0[l], ydata_w0_err[l])
         uval_sqrtS_w0 = ufloat(
             pl_data["sqrtS"][l] ** 2.0 * pl_data["wscale"][l] ** 2,
             np.sqrt(
@@ -225,7 +229,7 @@ for i in np.unique(chi_SPN["N"]):
     )
 
     popt, pcov = curve_fit(f, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-    chi2 = np.sum((ydata - f(xdata, *popt)) ** 2 / ydata_err ** 2) / (
+    chi2 = np.sum((ydata - f(xdata, *popt)) ** 2 / ydata_err**2) / (
         len(ydata) - len(popt)
     )
     perr = np.sqrt(np.diag(pcov))
@@ -291,7 +295,7 @@ for i in np.unique(chi_SPN["N"]):
     )
 
     popt, pcov = curve_fit(f, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-    chi2 = np.sum((ydata - f(xdata, *popt)) ** 2 / ydata_err ** 2) / (
+    chi2 = np.sum((ydata - f(xdata, *popt)) ** 2 / ydata_err**2) / (
         len(ydata) - len(popt)
     )
     perr = np.sqrt(np.diag(pcov))
@@ -363,7 +367,7 @@ for i in np.unique(chi_SPN["N"]):
     )
 
     popt, pcov = curve_fit(f, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-    chi2 = np.sum((ydata - f(xdata, *popt)) ** 2 / ydata_err ** 2) / (
+    chi2 = np.sum((ydata - f(xdata, *popt)) ** 2 / ydata_err**2) / (
         len(ydata) - len(popt)
     )
     perr = np.sqrt(np.diag(pcov))
@@ -406,7 +410,9 @@ for i in clim["N"]:
     val = ufloat(table_fits["chi"], table_fits["chi_err"])
     c2 = np.around(table_fits["chi2"], 2)[0]
     print("${}$ & ${:.2uS}$ & ${:.2f}$ \\\\".format(i, val, c2))
-    print(i, table_fits["chi"][0], table_fits["chi_err"][0], file=args.clim_data_file)
+    print(
+        i // 2, table_fits["chi"][0], table_fits["chi_err"][0], file=args.clim_data_file
+    )
 
 if args.clim_csv_file:
     csv_writer.writerows([v for _, v in sorted(clim_summary_data.items())])
