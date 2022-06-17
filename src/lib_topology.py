@@ -5,11 +5,12 @@ from scipy.interpolate import interp1d
 
 rng = np.random.default_rng()
 
+
 def get_rng(seed_string):
-    '''Return a numpy `default_rng` object seeded by the
-    MD5 hash of the given `seed_string`'''
+    """Return a numpy `default_rng` object seeded by the
+    MD5 hash of the given `seed_string`"""
     seed_hash = hashlib.md5(seed_string.encode("utf8")).digest()
-    seed = abs(int.from_bytes(seed_hash, 'big'))
+    seed = abs(int.from_bytes(seed_hash, "big"))
     return np.random.default_rng(seed)
 
 
@@ -28,7 +29,7 @@ def autocorr(indata):
         f2 = f2 + indata[j] ** 2
     f = 2.0 * avr
     avr = avr / (1.0 * L)
-    C0 = f2 / (1.0 * L) - avr ** 2
+    C0 = f2 / (1.0 * L) - avr**2
     tint = 0.5
     val = False
     for M in range(1, L):
@@ -68,7 +69,11 @@ def topo_find_alpha(din):
 
 def topo_load_raw_data(fname):
     patt = re.compile(r"WF_([0-9])_([0-9]+)_([0-9]+.[0-9]+)")
-    N, L, beta, = patt.search(fname).groups()
+    (
+        N,
+        L,
+        beta,
+    ) = patt.search(fname).groups()
     out_data = np.genfromtxt(
         fname,
         usecols=(0, 1, 2, 3, 4, 5, 6),
@@ -99,7 +104,7 @@ def bs_avg_err_TC(din, bin_size=20, rng=rng):
         avg = np.average([bin1[i] for i in sam])
         avg2 = np.average([bin2[i] for i in sam])
         resampled1.append(avg)
-        resampled2.append(avg2 - avg ** 2)
+        resampled2.append(avg2 - avg**2)
     return np.average(resampled2), np.std(resampled2)
 
 
@@ -140,7 +145,6 @@ def find_w0(indata, TE, rng=rng):
         t0 = np.append(t0, np.sqrt(f(TE)))
     a, b, c, d = bstrap(t0, 100, rng=rng)
     return a, c
-
 
 
 def flows(rawdata, N_bs, obs, Ntherm=500, rng=rng):
@@ -236,4 +240,4 @@ def d_g_SPN(n):
 
 
 def d_g_SUN(n):
-    return n ** 2 - 1.0
+    return n**2 - 1.0

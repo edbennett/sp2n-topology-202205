@@ -39,7 +39,11 @@ for fname in sys.argv[1:]:
         usecols=(0, 1, 2, 3, 4, 5, 6),
         names=["nconf", "t", "E", "t2E", "tsym", "t2symE", "TC"],
     )
-    N, L, beta, = patt.search(fname).groups()
+    (
+        N,
+        L,
+        beta,
+    ) = patt.search(fname).groups()
     print(N, L, beta)
 
     tmax = np.max(rawdata["t"])

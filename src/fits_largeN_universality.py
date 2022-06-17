@@ -35,11 +35,11 @@ def f1(x, a, b):
 
 
 def f2(x, a, b, c):
-    return a + b * x + c * x ** 2
+    return a + b * x + c * x**2
 
 
 def scaling_SUN(n):
-    return (n ** 2 - 1.0) / (4.0 * n ** 2)
+    return (n**2 - 1.0) / (4.0 * n**2)
 
 
 def scaling_SPN(n):
@@ -112,7 +112,7 @@ xdata = chi_total["d_G"]
 ydata = chi_total["sc_chi"]
 ydata_err = chi_total["sc_chi_err"]
 popt, pcov = curve_fit(f1, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-chi2 = np.sum((ydata - f1(xdata, *popt)) ** 2 / ydata_err ** 2) / (
+chi2 = np.sum((ydata - f1(xdata, *popt)) ** 2 / ydata_err**2) / (
     len(ydata) - len(popt)
 )
 perr = np.sqrt(np.diag(pcov))
@@ -160,7 +160,7 @@ xdata = chi_total["d_G"]
 ydata = chi_total["sc_chi"]
 ydata_err = chi_total["sc_chi_err"]
 popt, pcov = curve_fit(f1, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-chi2 = np.sum((ydata - f1(xdata, *popt)) ** 2 / ydata_err ** 2) / (
+chi2 = np.sum((ydata - f1(xdata, *popt)) ** 2 / ydata_err**2) / (
     len(ydata) - len(popt)
 )
 perr = np.sqrt(np.diag(pcov))
@@ -180,7 +180,7 @@ xdata = chi_total["d_G"]
 ydata = chi_total["sc_chi"]
 ydata_err = chi_total["sc_chi_err"]
 popt, pcov = curve_fit(f2, xdata, ydata, sigma=ydata_err, absolute_sigma=True)
-chi2 = np.sum((ydata - f2(xdata, *popt)) ** 2 / ydata_err ** 2) / (
+chi2 = np.sum((ydata - f2(xdata, *popt)) ** 2 / ydata_err**2) / (
     len(ydata) - len(popt)
 )
 perr = np.sqrt(np.diag(pcov))
