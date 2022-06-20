@@ -312,7 +312,7 @@ with open(tables_dir + "/summary_table.tex", "w") as outfile:
         Nc = int(i["N_c"])
         if i["label"] == "Bennett et al.":
             group_family = "Sp"
-            scaling = np.around(scaling_SPN(Nc / 2), 4)
+            scaling = np.around(scaling_SPN(Nc ), 4)
         else:
             group_family = "SU"
             scaling = np.around(scaling_SUN(int(i["N_c"])), 4)
