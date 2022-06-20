@@ -17,8 +17,8 @@ plt.rcParams["lines.markersize"] = 2
 plt.matplotlib.rc("font", size=11)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("TE", type=int)
-parser.add_argument("WE", type=int)
+parser.add_argument("TE", type=float)
+parser.add_argument("WE", type=float)
 parser.add_argument("faddrs", nargs="+")
 parser.add_argument("--plot_dir", default=".")
 parser.add_argument("--pickle_dir", default="pkl_flows_bs")
@@ -59,7 +59,7 @@ for faddr in args.faddrs:
 
     ax[0].set_xlabel(r"$t/t_0$")
     ax[0].set_ylabel(r"$\mathcal{E}(t)/C_2(F)$")
-    ax[0].axhline(y=TE, linestyle="dotted", alpha=0.7)
+    ax[0].axhline(y=args.TE, linestyle="dotted", alpha=0.7)
     color1 = next(plt.gca()._get_lines.prop_cycler)["color"]
     lab1 = (
         r"$N_c="
@@ -81,7 +81,7 @@ for faddr in args.faddrs:
 
     ax[1].set_xlabel(r"$t/w_0^2$")
     ax[1].set_ylabel(r"$\mathcal{W}(t)/C_2(F)$")
-    ax[1].axhline(y=WE, linestyle="dotted", alpha=0.7)
+    ax[1].axhline(y=args.WE, linestyle="dotted", alpha=0.7)
     plot_flow = es.avg_flows(w0_flow_symE)
     ax[1].fill_between(
         plot_flow["t"] / w0_tmp_symE[0] ** 2,
@@ -93,4 +93,4 @@ for faddr in args.faddrs:
     )
     ax[1].legend(loc=2, prop={"size": 7}, frameon=False)
 plt.tight_layout()
-plt.savefig(args.plot_dir + "/flows_" + str(TE) + "_" + str(WE) + "_scaled.pdf")
+plt.savefig(args.plot_dir + "/flows_" + str(args.TE) + "_" + str(args.WE) + "_scaled.pdf")
