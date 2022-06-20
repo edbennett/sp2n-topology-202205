@@ -23,7 +23,7 @@ for faddr in args.faddrs:
     rng = es.get_rng(faddr)
     fn_pkl = args.pickle_dir + "/pkl_bs_" + N + "_" + L + "_" + beta + "_"
 
-    bs_flow_E, w0_flow_E = es.flows(rawdata, args.num_bs, "t2E", rng=rng)
+    bs_flow_E, w0_flow_E = es.flows(rawdata, args.num_bs, "t2E", Ntherm=100, rng=rng)
 
     fn_t_E = open(fn_pkl + "t_E", "wb")
     pkl.dump(bs_flow_E, fn_t_E)
@@ -33,7 +33,9 @@ for faddr in args.faddrs:
     pkl.dump(w0_flow_E, fn_w_E)
     fn_w_E.close()
 
-    bs_flow_symE, w0_flow_symE = es.flows(rawdata, args.num_bs, "t2symE", rng=rng)
+    bs_flow_symE, w0_flow_symE = es.flows(
+        rawdata, args.num_bs, "t2symE", Ntherm=100, rng=rng
+    )
 
     fn_t_symE = open(fn_pkl + "t_symE", "wb")
     pkl.dump(bs_flow_symE, fn_t_symE)
