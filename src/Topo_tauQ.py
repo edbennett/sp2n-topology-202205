@@ -34,7 +34,7 @@ print(rawdata)
 
 plt.figure()
 plt.xlabel(r"$\sqrt{t_0}/a$")
-plt.ylabel(r"$\ln(\tau_Q N_\textrm{sw})$")
+plt.ylabel(r"$\tau_Q N_\textrm{sw}$")
 
 plt.yscale("log")
 Ns = np.unique(rawdata["N"])
