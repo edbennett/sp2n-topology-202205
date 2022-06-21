@@ -7,6 +7,7 @@
 /short_plots/
 /short_tables/
 /*.csv
+/datapackage.h5
 
 # GitHub boilerplate follows
 
