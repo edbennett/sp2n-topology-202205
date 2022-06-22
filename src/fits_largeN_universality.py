@@ -309,13 +309,15 @@ with open(tables_dir + "/summary_table.tex", "w") as outfile:
             prev_label = i["label"]
 
         print_val = ufloat(i["sc_chi"], i["sc_chi_err"])
-        Nc = int(i["N_c"])
+
         if i["label"] == "Bennett et al.":
+            Nc = int(i["N_c"]) * 2
             group_family = "Sp"
-            scaling = np.around(scaling_SPN(Nc ), 4)
+            scaling = np.around(scaling_SPN(Nc // 2), 4)
         else:
+            Nc = int(i["N_c"])
             group_family = "SU"
-            scaling = np.around(scaling_SUN(int(i["N_c"])), 4)
+            scaling = np.around(scaling_SUN(Nc), 4)
         group_label = f"${group_family}({Nc})$"
         tabular_results.append(
             [group_family, Nc, i["label"], i["sc_chi"], i["sc_chi_err"], scaling]
