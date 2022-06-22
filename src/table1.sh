@@ -22,7 +22,7 @@ for j in 2 4 6 8; do
     do
 		python src/Topo_binning.py ${TE} ${WE} ${PROC_DIR}/$i --num_bs ${NUM_BS} --data_dir ${DATA_DIR} --proc_dir ${PROC_DIR} --pickle_dir ${PICKLE_DIR} >> tmp0_tauQ
 	    paste -d" " tmp0_tauQ <(grep -c 0\\.000000 ${PROC_DIR}/${i}) > tmp1_tauQ
-		awk '{print "$"$1"$ & $"$2"$ & $"$3"$ & $"$4"$ & $"$6"$ & $"$5"$ \\\\"}' tmp1_tauQ >> ${OUTPUT_FILE}
+		awk '{print "$"$1"$ & $"$2"$ & $"$3"$ & $"$6"$ & $"$4"$ & $"$5"$ \\\\"}' tmp1_tauQ >> ${OUTPUT_FILE}
 		rm tmp0_tauQ tmp1_tauQ
 	done
 done
