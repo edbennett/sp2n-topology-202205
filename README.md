@@ -46,8 +46,8 @@ version of Make installed on macOS by default.
 
 ### Data
 
-* Download and extract the data. Specifically, you need the `data` directory,
-  provided as a ZIP file in the accompanying data release. By default it is
+* Download and extract the [data][data]. Specifically, you need the `data` directory,
+  provided as a ZIP file in [the accompanying data release][data]. By default it is
   expected that this is placed in the root directory of the repository,
   but this can be changed in the `Makefile`.
 
@@ -81,6 +81,7 @@ quotes results from a number of other publications. All quoted data is in the
 * `sqrts_vs_beta.dat`: Glueballs and strings in Sp(2N) Yang-Mills theories, Ed Bennett, Jack Holligan, Deog Ki Hong, Jong-Wan Lee, C.-J. David Lin, Biagio Lucini, Maurizio Piai, Davide Vadacchino, [Phys.Rev.D 103 (2021) 5, 054509](https://doi.org/10.1103/PhysRevD.103.054509). [arXiv:2010.15781](https://arxiv.org/abs/2010.15781)
 
 
+[data]: https://doi.org/10.5281/zenodo.6678411
 [long-paper]: https://arxiv.org/abs/2205.09364
 [short-paper]: https://arxiv.org/abs/2205.09254
 [athenodorou-teper]: https://doi.org/10.1007/JHEP12(2021)082
