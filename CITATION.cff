@@ -4,7 +4,7 @@
 cff-version: 1.2.0
 title: >-
   Sp(2N) Yang-Mills theories on the lattice: scale setting
-  and topology—code release
+  and topology—analysis workflow
 message: >-
   Please cite if you reuse portions of this code to
   enable your own work.
