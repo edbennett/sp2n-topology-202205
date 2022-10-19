@@ -1,12 +1,16 @@
 import os
 from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import matplotlib.ticker as ticker
 from matplotlib.ticker import AutoLocator
+from collections import Counter
+from uncertainties import ufloat, unumpy
 import numpy as np
 import re
 import sys
+import lib_topology as es
 
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Computer Modern Roman"]
@@ -20,6 +24,10 @@ plt.matplotlib.rc("font", size=9)
 outdir = os.environ.get("PLOT_DIR", ".")
 
 patt = re.compile(r"WF_([0-9])_([0-9]+)_([0-9]+.[0-9]+)")
+
+
+def f(x, A, m, s):
+    return A * np.exp(-((x - m) ** 2) / (2.0 * s ** 2))
 
 
 @ticker.FuncFormatter
@@ -39,17 +47,16 @@ for fname in sys.argv[1:]:
         usecols=(0, 1, 2, 3, 4, 5, 6),
         names=["nconf", "t", "E", "t2E", "tsym", "t2symE", "TC"],
     )
-    (
-        N,
-        L,
-        beta,
-    ) = patt.search(fname).groups()
+    (N, L, beta,) = patt.search(fname).groups()
     print(N, L, beta)
 
     tmax = np.max(rawdata["t"])
     TC = np.compress(rawdata["t"] == tmax, rawdata)
     TC = np.compress(TC["nconf"] < 4000, TC)
     maxTC = np.max(np.abs(TC["TC"])) + 5
+
+    tc, stc = es.bs_avg_binned(TC["TC"])
+
     print(tmax)
 
     axs0 = plt.subplot(gs[i, 0])
@@ -64,7 +71,34 @@ for fname in sys.argv[1:]:
     axs1.set_ylim(-maxTC, maxTC)
     axs1.set_xticks([])
     axs1.set_yticklabels([])
-    axs1.hist(TC["TC"], histtype="step", orientation="horizontal")
+    # axs1.hist(TC["TC"], histtype="step", orientation="horizontal")
+
+    Q_bins = Counter(np.rint(TC["TC"]))
+    range_min = min(min(Q_bins), -max(Q_bins)) - 1
+    # Add one to be inclusive
+    range_max = -range_min + 1
+    Q_range = np.arange(range_min, range_max)
+
+    Q_counts = [Q_bins[Q] for Q in Q_range]
+
+    axs1.step(Q_counts, Q_range - 0.5)
+
+    xdata = Q_range
+    ydata = Q_counts
+    ydata_err = np.sqrt(Q_counts)
+    popt, pcov = curve_fit(f, xdata, ydata)
+    smooth_Q_range = np.linspace(range_min - 0.5, range_max - 0.5, 1000)
+    axs1.plot(f(smooth_Q_range, *popt), smooth_Q_range)
+    textstr = r"$\langle Q_L \rangle = {:0.2uS}$".format(ufloat(tc, stc))
+    axs0.text(
+        0.05,
+        0.10,
+        textstr,
+        transform=axs0.transAxes,
+        fontsize=10,
+        verticalalignment="top",
+    )
+
     i = i + 1
 
 axs0.xaxis.set_major_locator(AutoLocator())

@@ -103,13 +103,16 @@ ${PLOT_DIR}/flows_%_scaled.pdf : ${FIG3_4_ARGS} ${FIG3_4_REQS} | ${PLOT_DIR}
 	python src/vis_WF_N_scaling.py $$(echo $* | sed "s/_/ /") ${FIG3_4_ARGS} --plot_dir ${PLOT_DIR} --num_bs ${NUM_BS}
 
 # Figure 5
-FIG5_OUTPUT = ${PLOT_DIR}/TCvst_8_16_26.7.pdf
+FIG5_OUTPUT = ${PLOT_DIR}/TCvst_8_16_26.7.pdf ${PLOT_DIR}/chivst_8_16_26.7.pdf
 
 ${PLOT_DIR}/TCvst_%.pdf : ${PROC_DIR}/WF_% $$(foreach FLOW, t_E w_E t_symE w_symE, $${PICKLE_DIR}/pkl_bs_$$*_$${FLOW}) | ${PLOT_DIR}
 	PLOT_DIR=${PLOT_DIR} python src/Topo_t.py ${TE} ${WE} ${PROC_DIR}/WF_$* --plot_dir ${PLOT_DIR} --num_bs ${NUM_BS}
 
+${PLOT_DIR}/chivst_%.pdf : ${PROC_DIR}/WF_% $$(foreach FLOW, t_E w_E t_symE w_symE, $${PICKLE_DIR}/pkl_bs_$$*_$${FLOW}) | ${PLOT_DIR}
+	PLOT_DIR=${PLOT_DIR} python src/chi_vs_t.py ${TE} ${WE} ${PROC_DIR}/WF_$* --plot_dir ${PLOT_DIR} --num_bs ${NUM_BS}
+
 # Figure 6, 7, 8, 9
-FIG6789_NC2_SUFFIXES = 32_2.65 32_2.70
+FIG6789_NC2_SUFFIXES = 20_2.55 32_2.70
 FIG6789_NC4_SUFFIXES = 20_7.7 24_8.2
 FIG6789_NC6_SUFFIXES = 18_15.75 20_16.3
 FIG6789_NC8_SUFFIXES = 16_26.5 16_27.2
