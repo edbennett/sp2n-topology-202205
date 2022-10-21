@@ -27,7 +27,7 @@ patt = re.compile(r"WF_([0-9])_([0-9]+)_([0-9]+.[0-9]+)")
 
 
 def f(x, A, m, s):
-    return A * np.exp(-((x - m) ** 2) / (2.0 * s ** 2))
+    return A * np.exp(-((x - m) ** 2) / (2.0 * s**2))
 
 
 @ticker.FuncFormatter
@@ -47,7 +47,11 @@ for fname in sys.argv[1:]:
         usecols=(0, 1, 2, 3, 4, 5, 6),
         names=["nconf", "t", "E", "t2E", "tsym", "t2symE", "TC"],
     )
-    (N, L, beta,) = patt.search(fname).groups()
+    (
+        N,
+        L,
+        beta,
+    ) = patt.search(fname).groups()
     print(N, L, beta)
 
     tmax = np.max(rawdata["t"])

@@ -92,7 +92,9 @@ for fname in args.fnames:
 
     rng = es.get_rng(f"{fname}_{args.TE}_bin")
     std_1 = binned_std(TC, 1, num_bs=args.num_bs)
-    binned_res = [(binned_std(TC, i, num_bs=args.num_bs) / std_1) ** 2 for i in bin_range]
+    binned_res = [
+        (binned_std(TC, i, num_bs=args.num_bs) / std_1) ** 2 for i in bin_range
+    ]
     lab = r"$\beta=" + str(beta) + "$"
     plt.plot(bin_range, binned_res, label=lab)
     name_postfix = name_postfix + beta

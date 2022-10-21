@@ -93,4 +93,6 @@ for faddr in args.faddrs:
     )
     ax[1].legend(loc=2, prop={"size": 7}, frameon=False)
 plt.tight_layout()
-plt.savefig(args.plot_dir + "/flows_" + str(args.TE) + "_" + str(args.WE) + "_scaled.pdf")
+plt.savefig(
+    args.plot_dir + "/flows_" + str(args.TE) + "_" + str(args.WE) + "_scaled.pdf"
+)

@@ -94,18 +94,17 @@ def topo_load_raw_data(fname):
 def bs_avg_binned(din, bin_size=20):
     bin1 = []
     bin2 = []
-    for i in range(int(len(din)/bin_size)):
-        bin1.append(np.average(din[ i*bin_size : (i+1)*bin_size ]))
+    for i in range(int(len(din) / bin_size)):
+        bin1.append(np.average(din[i * bin_size : (i + 1) * bin_size]))
 
     resampled1 = []
     resampled2 = []
     for j in range(100):
-        sam = np.random.randint(0,len(bin1),size=len(bin1))
-        avg = np.average( [ bin1[i] for i in sam ] )
-        resampled1.append( avg )
-    #print(N, L, beta)
+        sam = np.random.randint(0, len(bin1), size=len(bin1))
+        avg = np.average([bin1[i] for i in sam])
+        resampled1.append(avg)
+    # print(N, L, beta)
     return np.average(resampled1), np.std(resampled1)
-
 
 
 def bs_avg_err_TC(din, bin_size=20, rng=rng, num_bs=DEFAULT_NUM_BS):
