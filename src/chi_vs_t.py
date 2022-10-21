@@ -106,8 +106,7 @@ for fname in args.fnames:
     TC = find_TC(TCdata, t0_tmp_symE[0])
     # plot a vertical line corresponding to the value of t_0
     plt.axvline(x=t0_tmp_symE[0], linestyle='dotted',
-                color='r')
-    plt.plot([np.nan],[np.nan],label=r'$c_e='+str(args.TE)+'$', color='r')
+                color='r', label=r'$c_e='+str(args.TE)+'$')
 
     color0 = next(plt.gca()._get_lines.prop_cycler)['color']
     # compute and plot the susceptibility corresponding to 
@@ -121,8 +120,7 @@ for fname in args.fnames:
                  color='r')
     
     #Plot the chi as a function of flow-time t
-    plt.plot([np.nan],[np.nan],label=lab, color='r')
-    plt.plot(chivst['t'], chivst['chi'], color='r')
+    plt.plot(chivst['t'], chivst['chi'], color='r', label=lab)
     plt.fill_between(chivst['t'], chivst['chi']-chivst['chierr'], chivst['chi']+chivst['chierr'], 
             alpha=0.3, color='r')
 
