@@ -1,12 +1,7 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import re
-import matplotlib.ticker as ticker
-from matplotlib import gridspec
-from matplotlib.ticker import AutoLocator, MaxNLocator
-from scipy.interpolate import interp1d,UnivariateSpline, CubicSpline
-import itertools
+from scipy.interpolate import interp1d
 import lib_topology as es
 import pickle as pkl
 
@@ -15,11 +10,9 @@ plt.rcParams['font.serif'] = ['Computer Modern Roman']
 plt.rcParams['text.usetex'] = True
 plt.rcParams['lines.linewidth'] = .5
 plt.rcParams['figure.figsize']=[3.4,3.4]
-#colours = plt.rcParams['axes.color_cycle']
 plt.rcParams['errorbar.capsize'] = 2
 plt.rcParams['lines.markersize'] = 2
 plt.matplotlib.rc('font', size=11)
-#plt.style.use('classic')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("TE", type=float)
@@ -30,8 +23,6 @@ parser.add_argument("--pickle_dir", default="pkl_flows_bs")
 parser.add_argument("--num_bs", type=int, default=es.DEFAULT_NUM_BS)
 args = parser.parse_args()
 
-#data_nconf = np.genfromtxt('NCONF_vs_setup.txt', usecols=(0,1,2,3), 
-#        dtype=[("N",'i'), ("L",'i'),("beta", 'd'), ("Nconf",'i8')])
 
 def find_TC(rawdata, t):
     confs = np.unique(rawdata['nconf'])
@@ -43,8 +34,7 @@ def find_TC(rawdata, t):
         traj = data[idx-3:idx+3]
         f=interp1d(data['t'], data['TC'])
         TC[i-1]=f(t)
-        #print(i, TC[i-1])
-        #TC = np.append(TC, f(t))
+
     return TC
 
 def Casimir_SP(N):
@@ -57,9 +47,6 @@ for fname in args.fnames:
     N,L,beta,TCdata =es.topo_load_raw_data(fname)
     
     Nconf= int( np.max(TCdata['nconf']))
-    #NCONF = np.compress( data_nconf['beta']==float(beta), data_nconf['Nconf'])
-    #rawdata = np.compress( TCdata['nconf'] < NCONF+1, TCdata)
-    #TE_scaled = TE*Casimir_SP(iN)
     TE_scaled = args.TE * es.Casimir_SP(N)
     WE_scaled = args.WE * es.Casimir_SP(N)
 
@@ -99,8 +86,7 @@ for fname in args.fnames:
     plt.xlabel(r'$t/a^2$')
     plt.ylabel(r'$\chi_L a^4$')
     lab=r'$N_c='+str(int(N))+'$, $\\beta='+str(beta)+'$'
-    #print(lab)
-    
+
     #find the t_0 corresponding to the TE WE parameters
     t0_tmp_symE = es.find_t0(bs_flow_symE, TE_scaled)
     TC = find_TC(TCdata, t0_tmp_symE[0])
